@@ -29,4 +29,5 @@ entryLine (LinameEntry key path action) = showAction action ++ showKey key ++ "\
     showPath                = BU.toString . escape . BU.fromString
     showAction DoDelete     = "!!"
     showAction DoTrash      = "!"
+    showAction DoCopy       = "="
     showAction _            = ""
