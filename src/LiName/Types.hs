@@ -2,12 +2,12 @@
 
 module LiName.Types where
 
+import           Control.Lens
 import qualified Data.ByteString as B
 import qualified Data.ByteString.UTF8 as BU
-import           Text.ShellEscape (escape)
-import           Text.Printf (printf)
 import           Data.Default (def, Default)
-import           Control.Lens
+import           Text.Printf (printf)
+import           Text.ShellEscape (escape)
 
 
 type LiNamePath = FilePath

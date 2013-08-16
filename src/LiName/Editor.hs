@@ -7,12 +7,12 @@ module LiName.Editor (
 
 import LiName.Types
 
-import Data.Default (def)
 import Control.Lens
+import Data.Default (def)
 import System.Directory (getTemporaryDirectory)
 import System.Exit (ExitCode(..))
 import System.IO (hClose, hPutStr, openTempFile)
-import System.Process
+import System.Process (waitForProcess, runProcess)
 
 
 

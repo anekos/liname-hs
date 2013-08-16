@@ -4,9 +4,10 @@
 module LiName.Operators where
 
 import LiName.Types
+
+import Control.Lens
 import Data.List (find)
 import Data.Maybe (fromMaybe)
-import Control.Lens
 
 
 

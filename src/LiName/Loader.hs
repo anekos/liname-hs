@@ -5,13 +5,14 @@ module LiName.Loader (
   loadPath
 ) where
 
-import Control.Applicative
 import LiName.Parsers
 import LiName.Types
-import System.Directory (getDirectoryContents)
-import System.Posix.Files (getFileStatus, isDirectory)
+
+import Control.Applicative ((<$>))
 import Data.List (concat, concatMap, filter)
+import System.Directory (getDirectoryContents)
 import System.FilePath.Posix (joinPath)
+import System.Posix.Files (getFileStatus, isDirectory)
 
 
 

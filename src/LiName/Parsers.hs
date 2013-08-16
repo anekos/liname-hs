@@ -1,9 +1,10 @@
 
 module LiName.Parsers where
 
-import           LiName.Types
-import           Text.ParserCombinators.Parsec
-import           Text.ParserCombinators.Parsec.Error
+import LiName.Types
+
+import Text.ParserCombinators.Parsec
+import Text.ParserCombinators.Parsec.Error
 
 
 actionParser :: Parser (LiNamePath -> LiNameAction)
