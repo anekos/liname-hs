@@ -1,3 +1,4 @@
+{-# LANGUAGE TemplateHaskell #-}
 
 module LiName.Types where
 
@@ -6,6 +7,7 @@ import qualified Data.ByteString.UTF8 as BU
 import           Text.ShellEscape (escape)
 import           Text.Printf (printf)
 import           Data.Default (def, Default)
+import           Control.Lens
 
 
 type LiNamePath = FilePath
@@ -21,25 +23,32 @@ data LiNameAction = DoRename String
 
 
 data LiNameEntry = LiNameEntry
-                 { key      :: LiNameKey
-                 , path     :: LiNamePath
-                 , action   :: LiNameAction } deriving Show
+                 { _key      :: LiNameKey
+                 , _filepath :: LiNamePath
+                 , _action   :: LiNameAction } deriving Show
 
 
 data LiNameConfig = LiNameConfig
-                  { editor :: LCEditor }
+                  { _editor :: LCEditor }
+
 
 instance Default LiNameConfig where
     def = LiNameConfig def
 
 
 data LCEditor = LCEditor
-              { lcePath         :: FilePath
-              , lceArgs         :: [String]
-              , lcePlaceHolder  :: String }
+              { _path         :: FilePath
+              , _args         :: [String]
+              , _placeHolder  :: String }
 
 instance Default LCEditor where
   def = LCEditor "gvim" ["--nofork", "%"] "%"
+
+
+
+makeLenses ''LCEditor
+makeLenses ''LiNameConfig
+makeLenses ''LiNameEntry
 
 
 

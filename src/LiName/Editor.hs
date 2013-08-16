@@ -1,22 +1,25 @@
 
+{-# LANGUAGE TemplateHaskell #-}
+
 module LiName.Editor (
   edit
 ) where
 
 import LiName.Types
 
-import System.Process
-import System.Exit (ExitCode(..))
-import System.Directory (getTemporaryDirectory)
-import System.IO (hClose, hPutStr, openTempFile)
 import Data.Default (def)
+import Control.Lens
+import System.Directory (getTemporaryDirectory)
+import System.Exit (ExitCode(..))
+import System.IO (hClose, hPutStr, openTempFile)
+import System.Process
 
 
 
 edit :: LCEditor -> [String] -> IO [String]
 edit conf contents = do
     fn <- makeTempFile contents
-    runEditor (lcePath conf) $ editorArguments conf fn
+    runEditor (conf^.path) $ editorArguments conf fn
     readFile fn >>= return . lines
 
 
@@ -38,4 +41,4 @@ replace from args to = map (\x -> if x == from then to else x) args
 
 
 editorArguments :: LCEditor -> String -> [String]
-editorArguments conf = replace (lcePlaceHolder conf) $ lceArgs conf
+editorArguments conf = replace (conf^.placeHolder) (conf^.args)
