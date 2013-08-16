@@ -1,16 +1,23 @@
 
-import           LiName.Types
-import           LiName.Parsers
+import LiName.Types
+import LiName.Parsers
+import LiName.Operators
+import LiName.Editor
+import LiName.Loader
 
-import           Control.Applicative
-import           Control.Monad
-import           Text.Parsec.Prim (runP)
-import           Text.Parsec.Error (ParseError)
+import Control.Applicative ((<$>), (<*>))
+import Control.Monad (mapM)
+import Data.Default (def)
+import Data.Either (rights, lefts)
+import System.Environment (getArgs)
+import Text.Parsec.Error (ParseError)
+import Text.Parsec.Prim (runP)
 
 
 
-test :: String -> Either ParseError LinameEntry
-test s = runP entryParser () "<TEST>" s
-
-main = do ls <- lines <$> getContents
-          forM_ ls (print . test)
+main = do
+    src <- getArgs
+    es <- map entryLine <$> makeEntries <$> loadPath' src
+    es' <- map (parseEntry "<TEMP>") <$> edit def es
+    print $ rights es'
+    print $ lefts es'
