@@ -8,22 +8,22 @@ import           Text.Printf (printf)
 import           Data.Default (def, Default)
 
 
-type LinamePath = FilePath
+type LiNamePath = FilePath
 
-data LinameKey = LinameKey Int deriving (Show, Eq, Ord)
+data LiNameKey = LiNameKey Int deriving (Show, Eq, Ord)
 
 
-data LinameAction = DoRename String
+data LiNameAction = DoRename String
                   | DoDelete
                   | DoTrash
                   | DoCopy
                   deriving Show
 
 
-data LinameEntry = LinameEntry
-                 { key      :: LinameKey
-                 , path     :: LinamePath
-                 , action   :: LinameAction } deriving Show
+data LiNameEntry = LiNameEntry
+                 { key      :: LiNameKey
+                 , path     :: LiNamePath
+                 , action   :: LiNameAction } deriving Show
 
 
 data LiNameConfig = LiNameConfig
@@ -43,10 +43,10 @@ instance Default LCEditor where
 
 
 
-entryLine :: LinameEntry -> String
-entryLine (LinameEntry key path action) = showAction action ++ showKey key ++ "\t" ++ showPath path
+entryLine :: LiNameEntry -> String
+entryLine (LiNameEntry key path action) = showAction action ++ showKey key ++ "\t" ++ showPath path
   where
-    showKey (LinameKey x)   = printf "%.4d" x
+    showKey (LiNameKey x)   = printf "%.4d" x
     showPath                = BU.toString . escape . BU.fromString
     showAction DoDelete     = "!!"
     showAction DoTrash      = "!"

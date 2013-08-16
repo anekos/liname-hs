@@ -7,7 +7,7 @@ import Data.Maybe (fromMaybe)
 
 
 
-merge :: [LinameEntry] -> [LinameEntry]
+merge :: [LiNameEntry] -> [LiNameEntry]
 merge xs = map f xs
   where
     f x = fromMaybe x $ find (\y -> key y == key x) xs

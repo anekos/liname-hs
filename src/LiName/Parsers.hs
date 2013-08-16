@@ -6,7 +6,7 @@ import           Text.ParserCombinators.Parsec
 import           Text.ParserCombinators.Parsec.Error
 
 
-actionParser :: Parser (LinamePath -> LinameAction)
+actionParser :: Parser (LiNamePath -> LiNameAction)
 actionParser = do name <- many $ noneOf "0123456789"
                   case name of
                     "!!" -> return $ const DoDelete
@@ -15,13 +15,13 @@ actionParser = do name <- many $ noneOf "0123456789"
                     _ -> unexpected name
 
 
-keyParser :: Parser LinameKey
-keyParser = many1 digit >>= return . LinameKey . read
+keyParser :: Parser LiNameKey
+keyParser = many1 digit >>= return . LiNameKey . read
 
 
-entryParser :: Parser LinameEntry
+entryParser :: Parser LiNameEntry
 entryParser = do act <- actionParser
                  key <- keyParser
                  char '\t'
                  path <- many1 anyChar
-                 return $ LinameEntry key path (act path)
+                 return $ LiNameEntry key path (act path)
