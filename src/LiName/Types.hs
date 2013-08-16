@@ -29,6 +29,9 @@ data LinameEntry = LinameEntry
 data LiNameConfig = LiNameConfig
                   { editor :: LCEditor }
 
+instance Default LiNameConfig where
+    def = LiNameConfig def
+
 
 data LCEditor = LCEditor
               { lcePath         :: FilePath
