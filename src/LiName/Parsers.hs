@@ -1,10 +1,18 @@
 
-module LiName.Parsers where
+module LiName.Parsers (
+  parseEntry
+) where
 
 import LiName.Types
 
 import Text.ParserCombinators.Parsec
 import Text.ParserCombinators.Parsec.Error
+import Text.Parsec.Prim (runP)
+
+
+
+parseEntry :: String -> String -> Either ParseError LiNameEntry
+parseEntry = runP entryParser ()
 
 
 actionParser :: Parser (LiNamePath -> LiNameAction)
