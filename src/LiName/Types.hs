@@ -14,6 +14,7 @@ data LinameKey = LinameKey Int deriving (Show, Eq, Ord)
 data LinameAction = DoRename String
                   | DoDelete
                   | DoTrash
+                  | DoCopy
                   deriving Show
 
 data LinameEntry = LinameEntry
