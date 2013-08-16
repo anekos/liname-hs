@@ -9,7 +9,7 @@ import           Text.Printf (printf)
 
 type LinamePath = FilePath
 
-data LinameKey = LinameKey Int deriving Show
+data LinameKey = LinameKey Int deriving (Show, Eq, Ord)
 
 data LinameAction = DoRename String
                   | DoDelete
