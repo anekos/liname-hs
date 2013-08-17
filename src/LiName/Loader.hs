@@ -13,7 +13,7 @@ import LiName.Types
 import Control.Applicative ((<$>), pure)
 import Data.List (concat, concatMap, filter)
 import System.Directory (getDirectoryContents)
-import System.FilePath.Posix (joinPath)
+import System.FilePath (combine)
 import System.Posix.Files (getFileStatus, isDirectory, isRegularFile)
 import System.IO.Error (catchIOError)
 
@@ -33,7 +33,7 @@ loadPath' fps = concat <$> mapM loadPath fps
 
 
 ls :: FilePath -> IO [FilePath]
-ls dir = map (joinPath . (dir:) . pure) <$> filter notDots <$> getDirectoryContents dir
+ls dir = map (combine dir) <$> filter notDots <$> getDirectoryContents dir
   where
     notDots "."  = False
     notDots ".." = False
