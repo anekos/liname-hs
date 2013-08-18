@@ -19,13 +19,13 @@ data LiNameAction = DoRename String
                   | DoDelete
                   | DoTrash
                   | DoCopy
-                  deriving Show
+                  deriving (Show, Eq)
 
 
 data LiNameEntry = LiNameEntry
                  { _key      :: LiNameKey
                  , _filepath :: LiNamePath
-                 , _action   :: LiNameAction } deriving Show
+                 , _action   :: LiNameAction } deriving (Show, Eq)
 
 
 data LiNameConfig = LiNameConfig
