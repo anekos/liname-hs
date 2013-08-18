@@ -5,6 +5,7 @@ module LiName.Parsers (
 
 import LiName.Types
 
+import Control.Applicative ((<$>))
 import Text.ParserCombinators.Parsec
 import Text.ParserCombinators.Parsec.Error
 import Text.Parsec.Prim (runP)
@@ -20,12 +21,12 @@ actionParser = do name <- many $ noneOf "0123456789"
                   case name of
                     "!!" -> return $ const DoDelete
                     "!" -> return $ const DoTrash
-                    "" -> return $ DoRename
+                    "" -> return DoRename
                     _ -> unexpected name
 
 
 keyParser :: Parser LiNameKey
-keyParser = many1 digit >>= return . LiNameKey . read
+keyParser = LiNameKey . read <$> many1 digit
 
 
 entryParser :: Parser LiNameEntry

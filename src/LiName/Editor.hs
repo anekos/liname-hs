@@ -1,6 +1,4 @@
 
-{-# LANGUAGE TemplateHaskell #-}
-
 module LiName.Editor (
   edit
 ) where
@@ -8,6 +6,7 @@ module LiName.Editor (
 import LiName.Types
 
 import Control.Lens
+import Control.Applicative ((<$>))
 import Data.Default (def)
 import System.Directory (getTemporaryDirectory)
 import System.Exit (ExitCode(..))
@@ -20,7 +19,7 @@ edit :: LCEditor -> [String] -> IO [String]
 edit conf contents = do
     fn <- makeTempFile contents
     runEditor (conf^.path) $ editorArguments conf fn
-    readFile fn >>= return . lines
+    lines <$> readFile fn
 
 
 runEditor :: FilePath -> [String] -> IO ExitCode

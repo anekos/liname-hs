@@ -1,6 +1,4 @@
 
-{-# LANGUAGE TemplateHaskell #-}
-
 module LiName.Operators where
 
 import LiName.Types

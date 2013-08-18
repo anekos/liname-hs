@@ -11,6 +11,9 @@ t:
 	cabal build
 	cabal test
 
+l: build
+	hlint src
+
 ctags:
 	cd src && lushtags **/*.hs | tee tags
 

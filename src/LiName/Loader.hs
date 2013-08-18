@@ -1,6 +1,4 @@
 
-{-# LANGUAGE TemplateHaskell #-}
-
 module LiName.Loader (
   loadPath,
   loadPath',
