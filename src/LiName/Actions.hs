@@ -11,26 +11,35 @@ import Control.Applicative ((<$>))
 import Control.Lens
 import Control.Monad (void)
 import System.Directory (copyFile)
-import System.Exit (ExitCode(ExitSuccess))
+import System.Exit (ExitCode(ExitSuccess, ExitFailure))
 import System.IO.Error (catchIOError)
 import System.Posix.Files (removeLink, rename)
 
 
 
-doAction :: LiNameConfig -> FilePath -> LiNameEntry -> IO Bool
+doAction :: LiNameConfig -> FilePath -> LiNameEntry -> IO (Either String ())
 doAction c fp e = doAction' c fp (e^.action)
 
 
-doAction' :: LiNameConfig -> LiNamePath -> LiNameAction -> IO Bool
-doAction' _ f (DoRename t) = eqOr f t <$> (boolCatch $ rename f t)
-doAction' _ f (DoCopy t)   = eqOr f t <$> (boolCatch $ copyFile f t)
-doAction' _ f DoDelete     = boolCatch $ removeLink f
-doAction' c f DoTrash      = boolCatch $ (== ExitSuccess) <$> run (c^.trashCommand) f
+doAction' :: LiNameConfig -> LiNamePath -> LiNameAction -> IO (Either String ())
+doAction' _ f (DoRename t)
+    | f == t               = return $ Right ()
+    | otherwise            = msgCatch $ rename f t
+doAction' _ f (DoCopy t)
+    | f == t               = return $ Right ()
+    | otherwise            = msgCatch $ copyFile f t
+doAction' _ f DoDelete     = msgCatch $ removeLink f
+doAction' c f DoTrash      = msgCatch $ fromExitCode <$> run (c^.trashCommand) f
 
 
-eqOr :: Eq a => a -> a -> Bool -> Bool
-eqOr x y = ((x == y) ||)
+fromExitCode :: ExitCode -> Either String ()
+fromExitCode ExitSuccess      = Right ()
+fromExitCode (ExitFailure x)  = Left $ "ExitCode: " ++ show x
 
 
-boolCatch :: IO a -> IO Bool
-boolCatch act = act >> return True `catchIOError` const (return False)
+msgCatch :: IO a -> IO (Either String ())
+msgCatch act = do
+    act
+    return $ Right ()
+  `catchIOError`
+    (return . Left . show)

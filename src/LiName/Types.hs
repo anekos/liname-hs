@@ -22,7 +22,7 @@ data LiNameAction = DoRename String
                   deriving (Show, Eq)
 
 
-data LiNameSource = LiNameSource { _srcKey :: LiNameKey, _srcPath :: LiNamePath } deriving Show
+type LiNameSource = (LiNameKey, LiNamePath)
 
 
 data LiNameEntry = LiNameEntry { _entryKey :: LiNameKey, _action :: LiNameAction } deriving (Show, Eq)

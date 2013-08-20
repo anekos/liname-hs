@@ -43,4 +43,4 @@ loadDirectory dir = concat <$> (ls dir >>= mapM loadPath)
 
 
 makeSources:: [FilePath] -> [LiNameSource]
-makeSources= zipWith LiNameSource $ map LiNameKey [0..]
+makeSources= zipWith (,) $ map LiNameKey [0..]
