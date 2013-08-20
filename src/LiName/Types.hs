@@ -22,10 +22,10 @@ data LiNameAction = DoRename String
                   deriving (Show, Eq)
 
 
-data LiNameEntry = LiNameEntry
-                 { _key      :: LiNameKey
-                 , _filepath :: LiNamePath
-                 , _action   :: LiNameAction } deriving (Show, Eq)
+data LiNameSource = LiNameSource { _srcKey :: LiNameKey, _srcPath :: LiNamePath } deriving Show
+
+
+data LiNameEntry = LiNameEntry { _entryKey :: LiNameKey, _action :: LiNameAction } deriving (Show, Eq)
 
 
 data LiNameCommand = LiNameCommand
@@ -49,15 +49,3 @@ instance Default LiNameConfig where
 makeLenses ''LiNameCommand
 makeLenses ''LiNameConfig
 makeLenses ''LiNameEntry
-
-
-
-entryLine :: LiNameEntry -> String
-entryLine (LiNameEntry key path action) = showAction action ++ showKey key ++ "\t" ++ showPath path
-  where
-    showKey (LiNameKey x)   = printf "%.4d" x
-    showPath                = BU.toString . escape . BU.fromString
-    showAction DoDelete     = "!!"
-    showAction DoTrash      = "!"
-    showAction (DoCopy _)   = "="
-    showAction _            = ""

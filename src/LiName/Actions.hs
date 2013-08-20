@@ -17,8 +17,8 @@ import System.Posix.Files (removeLink, rename)
 
 
 
-doAction :: LiNameConfig -> LiNameEntry -> IO Bool
-doAction c e = doAction' c (e^.filepath) (e^.action)
+doAction :: LiNameConfig -> FilePath -> LiNameEntry -> IO Bool
+doAction c fp e = doAction' c fp (e^.action)
 
 
 doAction' :: LiNameConfig -> LiNamePath -> LiNameAction -> IO Bool

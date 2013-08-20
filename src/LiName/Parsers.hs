@@ -34,4 +34,4 @@ entryParser = do act <- actionParser
                  key <- keyParser
                  char '\t'
                  path <- many1 anyChar
-                 return $ LiNameEntry key path (act path)
+                 return $ LiNameEntry key (act path)
