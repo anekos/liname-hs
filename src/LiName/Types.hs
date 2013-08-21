@@ -18,46 +18,34 @@ data LiNameKey = LiNameKey Int deriving (Show, Eq, Ord)
 data LiNameAction = DoRename String
                   | DoDelete
                   | DoTrash
-                  | DoCopy
+                  | DoCopy String
                   deriving (Show, Eq)
 
 
-data LiNameEntry = LiNameEntry
-                 { _key      :: LiNameKey
-                 , _filepath :: LiNamePath
-                 , _action   :: LiNameAction } deriving (Show, Eq)
+type LiNameSource = (LiNameKey, LiNamePath)
+
+
+data LiNameEntry = LiNameEntry { _entryKey :: LiNameKey, _action :: LiNameAction } deriving (Show, Eq)
+
+
+data LiNameCommand = LiNameCommand
+                   { _path         :: FilePath
+                   , _args         :: [String]
+                   , _placeHolder  :: String }
 
 
 data LiNameConfig = LiNameConfig
-                  { _editor :: LCEditor }
+                  { _editorCommand :: LiNameCommand
+                  , _trashCommand :: LiNameCommand }
 
 
 instance Default LiNameConfig where
-    def = LiNameConfig def
-
-
-data LCEditor = LCEditor
-              { _path         :: FilePath
-              , _args         :: [String]
-              , _placeHolder  :: String }
-
-instance Default LCEditor where
-  def = LCEditor "gvim" ["--nofork", "%"] "%"
+    def = LiNameConfig { _editorCommand = LiNameCommand "gvim" ["--nofork", "%"] "%"
+                       , _trashCommand = LiNameCommand "gvim" ["--nofork", "%"] "%" }
 
 
 
-makeLenses ''LCEditor
+
+makeLenses ''LiNameCommand
 makeLenses ''LiNameConfig
 makeLenses ''LiNameEntry
-
-
-
-entryLine :: LiNameEntry -> String
-entryLine (LiNameEntry key path action) = showAction action ++ showKey key ++ "\t" ++ showPath path
-  where
-    showKey (LiNameKey x)   = printf "%.4d" x
-    showPath                = BU.toString . escape . BU.fromString
-    showAction DoDelete     = "!!"
-    showAction DoTrash      = "!"
-    showAction DoCopy       = "="
-    showAction _            = ""

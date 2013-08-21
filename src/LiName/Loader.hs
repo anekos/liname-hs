@@ -2,7 +2,7 @@
 module LiName.Loader (
   loadPath,
   loadPath',
-  makeEntries
+  makeSources
 ) where
 
 import LiName.Parsers
@@ -42,9 +42,5 @@ loadDirectory :: FilePath -> IO [LiNamePath]
 loadDirectory dir = concat <$> (ls dir >>= mapM loadPath)
 
 
-makeEntries :: [FilePath] -> [LiNameEntry]
-makeEntries = zipWith f [0..]
-  where
-    f i p = LiNameEntry { _key = LiNameKey i
-                        , _filepath = p
-                        , _action = DoRename p }
+makeSources:: [FilePath] -> [LiNameSource]
+makeSources= zipWith (,) $ map LiNameKey [0..]
