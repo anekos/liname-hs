@@ -25,7 +25,7 @@ loadConfigFile = do
     y <- load $ combine home ".liname.yaml"
     ec <- makeCommand' y "editor" editorCommandDefault
     tc <- makeCommand' y "trash" trashCommandDefault
-    return $ LiNameConfig { _editorCommand = ec, _trashCommand = tc }
+    return LiNameConfig { _editorCommand = ec, _trashCommand = tc }
   `catch`
     catchAndReturnDefault def
 

@@ -24,7 +24,7 @@ import Text.ShellEscape (escape)
 
 
 sourceLine :: LiNameSource -> String
-sourceLine ((LiNameKey key), fp) = printf "%.4d\t%s" key $ toString $ escape $ fromString fp
+sourceLine (LiNameKey key, fp) = printf "%.4d\t%s" key $ toString $ escape $ fromString fp
 
 
 process :: LiNameConfig -> Map LiNameKey LiNamePath -> LiNameEntry -> IO (Either String ())
