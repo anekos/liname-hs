@@ -4,7 +4,7 @@ build:
 	cabal --with-ld=ld.gold build
 
 i:
-	ghci -isrc src/test.hs
+	ghci -isrc src/liname.hs
 
 t:
 	cabal configure --enable-tests
