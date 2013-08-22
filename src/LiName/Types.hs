@@ -31,19 +31,22 @@ data LiNameEntry = LiNameEntry { _entryKey :: LiNameKey, _action :: LiNameAction
 data LiNameCommand = LiNameCommand
                    { _path         :: FilePath
                    , _args         :: [String]
-                   , _placeHolder  :: String }
+                   , _placeHolder  :: String } deriving Show
 
 
 data LiNameConfig = LiNameConfig
                   { _editorCommand :: LiNameCommand
-                  , _trashCommand :: LiNameCommand }
+                  , _trashCommand :: LiNameCommand } deriving Show
 
 
 instance Default LiNameConfig where
-    def = LiNameConfig { _editorCommand = LiNameCommand "gvim" ["--nofork", "%"] "%"
-                       , _trashCommand = LiNameCommand "gvim" ["--nofork", "%"] "%" }
+    def = LiNameConfig { _editorCommand = editorCommandDefault
+                       , _trashCommand = trashCommandDefault }
 
 
+editorCommandDefault, trashCommandDefault :: LiNameCommand
+editorCommandDefault = LiNameCommand "gvim" ["--nofork", "%"] "%"
+trashCommandDefault  = LiNameCommand "false" [] "%"
 
 
 makeLenses ''LiNameCommand
