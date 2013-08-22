@@ -9,10 +9,9 @@ import LiName.Command
 
 import Control.Applicative ((<$>))
 import Control.Lens
-import System.Directory (copyFile, createDirectoryIfMissing)
+import System.Directory (copyFile, createDirectoryIfMissing, removeFile, renameFile)
 import System.Exit (ExitCode(ExitSuccess, ExitFailure))
 import System.IO.Error (catchIOError)
-import System.Posix.Files (removeLink, rename)
 import System.FilePath.Posix (takeDirectory)
 
 
@@ -20,11 +19,11 @@ import System.FilePath.Posix (takeDirectory)
 doAction :: LiNameConfig -> LiNameAction -> LiNamePath -> IO (Either String ())
 doAction _ (DoRename t) f
     | f == t               = return $ Right ()
-    | otherwise            = msgCatch t $ createDirectoryIfMissing True (takeDirectory t) >> rename f t
+    | otherwise            = msgCatch t $ createDirectoryIfMissing True (takeDirectory t) >> renameFile f t
 doAction _ (DoCopy t) f
     | f == t               = return $ Right ()
     | otherwise            = msgCatch t $ createDirectoryIfMissing True (takeDirectory t) >> copyFile f t
-doAction _ DoDelete f      = msgCatch f $ removeLink f
+doAction _ DoDelete f      = msgCatch f $ removeFile f
 doAction c DoTrash  f      = msgCatch f $ fromExitCode <$> run (c^.trashCommand) f
 
 
