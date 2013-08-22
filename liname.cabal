@@ -27,9 +27,9 @@ cabal-version:       >=1.10
 
 executable liname
   main-is:             liname.hs
-  other-modules:       LiName.Types, LiName.Parsers
   build-depends:       base             == 4.6.*,
                        bytestring       == 0.10.*,
+                       containers       == 0.5.*,
                        data-default     == 0.5.*,
                        directory        == 1.2.*,
                        filepath         == 1.3.*,
