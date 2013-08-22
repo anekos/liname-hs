@@ -11,13 +11,14 @@ import LiName.Types
 import Prelude hiding (lookup)
 import Control.Applicative ((<$>))
 import Control.Lens
-import Control.Monad (forM, forM_)
+import Control.Monad (forM)
 import Data.ByteString.UTF8 (fromString, toString)
 import Data.Default (def)
-import Data.Either (rights)
+import Data.Either (lefts, rights)
 import Data.Map (Map, fromList)
 import Data.Map.Lazy (lookup)
 import System.Environment (getArgs)
+import System.IO (hPutStrLn, stderr)
 import Text.Printf (printf)
 import Text.ShellEscape (escape)
 
@@ -39,4 +40,4 @@ main = do
     ss :: [LiNameSource] <- makeSources <$> (loadPath' =<< getArgs)
     es' <- map (parseEntry "<TEMP>") <$> edit (def^.editorCommand) (map sourceLine ss)
     results <- forM (rights es') $ process conf (fromList ss)
-    forM_ results print
+    mapM_ (hPutStrLn stderr) $ lefts results
