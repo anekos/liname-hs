@@ -3,6 +3,7 @@
 
 import LiName.Actions
 import LiName.Command
+import LiName.Config
 import LiName.Loader
 import LiName.Parsers
 import LiName.Types
