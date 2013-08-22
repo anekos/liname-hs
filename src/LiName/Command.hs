@@ -8,7 +8,6 @@ import LiName.Types
 
 import Control.Applicative ((<$>))
 import Control.Lens
-import Data.Default (def)
 import System.Directory (getTemporaryDirectory)
 import System.Exit (ExitCode(..))
 import System.IO (hClose, hPutStr, openTempFile)
@@ -18,8 +17,8 @@ import System.Process (waitForProcess, runProcess)
 
 run :: LiNameCommand -> String -> IO ExitCode
 run cmd arg = do
-    let args = genArgs cmd arg
-    runProcess (cmd^.path) args Nothing Nothing Nothing Nothing Nothing >>= waitForProcess
+    let as = genArgs cmd arg
+    runProcess (cmd^.path) as Nothing Nothing Nothing Nothing Nothing >>= waitForProcess
 
 
 edit :: LiNameCommand -> [String] -> IO [String]
@@ -43,4 +42,4 @@ genArgs conf = replace (conf^.placeHolder) (conf^.args)
 
 
 replace :: String -> [String] -> String -> [String]
-replace from args to = map (\x -> if x == from then to else x) args
+replace f as t = map (\x -> if x == f then t else x) as

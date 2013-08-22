@@ -3,11 +3,10 @@ module LiName.Parsers (
   parseEntry
 ) where
 
-import LiName.Types
+import LiName.Types (LiNamePath, LiNameAction(..), LiNameEntry(..), LiNameKey(..))
 
 import Control.Applicative ((<$>))
 import Text.ParserCombinators.Parsec
-import Text.ParserCombinators.Parsec.Error
 import Text.Parsec.Prim (runP)
 
 
