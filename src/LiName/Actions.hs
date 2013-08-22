@@ -9,7 +9,6 @@ import LiName.Command
 
 import Control.Applicative ((<$>))
 import Control.Lens
-import Control.Monad (void)
 import System.Directory (copyFile, createDirectoryIfMissing)
 import System.Exit (ExitCode(ExitSuccess, ExitFailure))
 import System.IO.Error (catchIOError)
@@ -19,7 +18,7 @@ import System.FilePath.Posix (takeDirectory)
 
 
 doAction :: LiNameConfig -> LiNameAction -> LiNamePath -> IO (Either String ())
-doAction conf (DoRename t) f
+doAction _ (DoRename t) f
     | f == t               = return $ Right ()
     | otherwise            = msgCatch t $ createDirectoryIfMissing True (takeDirectory t) >> rename f t
 doAction _ (DoCopy t) f
@@ -35,8 +34,8 @@ fromExitCode (ExitFailure x)  = Left $ "ExitCode: " ++ show x
 
 
 msgCatch :: LiNamePath -> IO a -> IO (Either String ())
-msgCatch fp act = do
-    act
+msgCatch fp a = do
+    a
     return $ Right ()
   `catchIOError`
     (return . Left . (++ fp) . (++ ": ") . show)

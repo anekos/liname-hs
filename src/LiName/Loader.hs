@@ -5,11 +5,9 @@ module LiName.Loader (
   makeSources
 ) where
 
-import LiName.Parsers
 import LiName.Types
 
-import Control.Applicative ((<$>), pure)
-import Data.List (concat, concatMap, filter)
+import Control.Applicative ((<$>))
 import System.Directory (getDirectoryContents)
 import System.FilePath (combine)
 import System.Posix.Files (getFileStatus, isDirectory, isRegularFile)

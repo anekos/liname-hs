@@ -8,7 +8,6 @@ module LiName.Config (
 
 import LiName.Types
 
-import Prelude hiding (catch)
 import Control.Exception
 import Control.Lens
 import Data.Default (def)
@@ -42,8 +41,8 @@ makeCommand' y n d = withDefault d $ makeCommand d <$> subconfig y (pack n)
 
 
 withDefault :: a -> IO a -> IO a
-withDefault d act = act `catch` catchAndReturnDefault d
+withDefault d a = a `catch` catchAndReturnDefault d
 
 
 catchAndReturnDefault :: a -> SomeException -> IO a
-catchAndReturnDefault d e = return d
+catchAndReturnDefault d _ = return d
