@@ -34,7 +34,7 @@ process conf sm (LiNameEntry {_entryKey = key, _action = act })
 
 
 main = do
-    let conf = def :: LiNameConfig
+    conf <- loadConfigFile
     ss :: [LiNameSource] <- makeSources <$> (loadPath' =<< getArgs)
     es' <- map (parseEntry "<TEMP>") <$> edit (def^.editorCommand) (map sourceLine ss)
     results <- forM (rights es') $ process conf (fromList ss)
