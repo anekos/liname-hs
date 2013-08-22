@@ -17,19 +17,15 @@ import System.Posix.Files (removeLink, rename)
 
 
 
-doAction :: LiNameConfig -> FilePath -> LiNameEntry -> IO (Either String ())
-doAction c fp e = doAction' c fp (e^.action)
-
-
-doAction' :: LiNameConfig -> LiNamePath -> LiNameAction -> IO (Either String ())
-doAction' _ f (DoRename t)
+doAction :: LiNameConfig -> LiNameAction -> LiNamePath -> IO (Either String ())
+doAction conf (DoRename t) f
     | f == t               = return $ Right ()
     | otherwise            = msgCatch $ rename f t
-doAction' _ f (DoCopy t)
+doAction _ (DoCopy t) f
     | f == t               = return $ Right ()
     | otherwise            = msgCatch $ copyFile f t
-doAction' _ f DoDelete     = msgCatch $ removeLink f
-doAction' c f DoTrash      = msgCatch $ fromExitCode <$> run (c^.trashCommand) f
+doAction _ DoDelete f      = msgCatch $ removeLink f
+doAction c DoTrash  f      = msgCatch $ fromExitCode <$> run (c^.trashCommand) f
 
 
 fromExitCode :: ExitCode -> Either String ()
