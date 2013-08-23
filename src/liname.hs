@@ -11,7 +11,7 @@ import LiName.Types
 import Prelude hiding (lookup)
 import Control.Applicative ((<$>))
 import Control.Lens
-import Control.Monad (forM)
+import Control.Monad (forM, when)
 import Data.ByteString.UTF8 (fromString, toString)
 import Data.Default (def)
 import Data.Either (lefts, rights)
@@ -34,10 +34,30 @@ process conf sm (LiNameEntry {_entryKey = k, _action = a })
     | otherwise              = return $ Left $ "Not found key: " ++ show k
 
 
+indent :: String -> String
+indent = ("  " ++)
+
+
+putResult :: [LiNameSource] -> [LiNameEntry] -> [Either String ()] -> IO ()
+putResult ss es rs = do
+    let sl = length ss
+        el = length es
+        rrl = length $ rights rs
+        rll = length $ lefts rs
+    putStrLn   "Results"
+    putStrLn $ "  input: " ++ show sl
+    putStrLn $ "  try: " ++ show el
+    putStrLn $ "  success: " ++ show rrl
+    putStrLn $ "  fail: " ++ show rll
+    when (rll > 0) $ do
+      hPutStrLn stderr "Fails"
+      mapM_ (hPutStrLn stderr . indent) $ lefts rs
+
+
 main :: IO ()
 main = do
     conf <- loadConfigFile
     ss :: [LiNameSource] <- makeSources <$> (loadPath' =<< getArgs)
     es' <- map (parseEntry "<TEMP>") <$> edit (def^.editorCommand) (map sourceLine ss)
     results <- forM (rights es') $ process conf (fromList ss)
-    mapM_ (hPutStrLn stderr) $ lefts results
+    putResult ss (rights es') results
