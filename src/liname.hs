@@ -24,6 +24,31 @@ import Text.ShellEscape (escape)
 
 
 
+main :: IO ()
+main = do
+    conf <- loadConfigFile
+    ss :: [LiNameSource] <- makeSources <$> (loadPath' =<< getArgs)
+    es' <- map (parseEntry "<TEMP>") <$> edit (def^.editorCommand) (map sourceLine ss)
+    results <- forM (rights es') $ process conf (fromList ss)
+    putResult ss (rights es') results
+
+
+putResult :: [LiNameSource] -> [LiNameEntry] -> [Either String ()] -> IO ()
+putResult ss es rs = do
+    let sl = length ss
+        el = length es
+        rrl = length $ rights rs
+        rll = length $ lefts rs
+    putStrLn "Results"
+    putStrLn $ indent "input: " ++ show sl
+    putStrLn $ indent "try: " ++ show el
+    putStrLn $ indent "success: " ++ show rrl
+    putStrLn $ indent "fail: " ++ show rll
+    when (rll > 0) $ do
+      hPutStrLn stderr "Fails"
+      mapM_ (hPutStrLn stderr . indent) $ lefts rs
+
+
 sourceLine :: LiNameSource -> String
 sourceLine (LiNameKey key, fp) = printf "%.4d\t%s" key $ toString $ escape $ fromString fp
 
@@ -36,28 +61,3 @@ process conf sm (LiNameEntry {_entryKey = k, _action = a })
 
 indent :: String -> String
 indent = ("  " ++)
-
-
-putResult :: [LiNameSource] -> [LiNameEntry] -> [Either String ()] -> IO ()
-putResult ss es rs = do
-    let sl = length ss
-        el = length es
-        rrl = length $ rights rs
-        rll = length $ lefts rs
-    putStrLn   "Results"
-    putStrLn $ "  input: " ++ show sl
-    putStrLn $ "  try: " ++ show el
-    putStrLn $ "  success: " ++ show rrl
-    putStrLn $ "  fail: " ++ show rll
-    when (rll > 0) $ do
-      hPutStrLn stderr "Fails"
-      mapM_ (hPutStrLn stderr . indent) $ lefts rs
-
-
-main :: IO ()
-main = do
-    conf <- loadConfigFile
-    ss :: [LiNameSource] <- makeSources <$> (loadPath' =<< getArgs)
-    es' <- map (parseEntry "<TEMP>") <$> edit (def^.editorCommand) (map sourceLine ss)
-    results <- forM (rights es') $ process conf (fromList ss)
-    putResult ss (rights es') results
