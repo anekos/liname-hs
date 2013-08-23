@@ -14,7 +14,6 @@ import Control.Applicative ((<$>))
 import Control.Lens
 import Control.Monad (forM, when)
 import Data.ByteString.UTF8 (fromString, toString)
-import Data.Default (def)
 import Data.Either (lefts, rights)
 import Data.Map (Map, fromList)
 import Data.Map.Lazy (lookup)
@@ -29,7 +28,7 @@ main :: IO ()
 main = do
     conf <- loadConfigFile
     ss :: [LiNameSource] <- makeSources <$> (loadPath' =<< getArgs)
-    es' <- map (parseEntry "<TEMP>") <$> edit (def^.editorCommand) (map sourceLine ss)
+    es' <- map (parseEntry "<TEMP>") <$> edit (conf^.editorCommand) (map sourceLine ss)
     results <- forM (rights es') $ process conf (fromList ss)
     clean $ rights results
     putResult ss (rights es') results
