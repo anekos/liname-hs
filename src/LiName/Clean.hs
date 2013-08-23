@@ -4,6 +4,7 @@ module LiName.Clean (
 ) where
 
 import LiName.Types
+import LiName.Utils
 
 import Data.List (nub)
 import System.FilePath.Posix (takeDirectory)
@@ -15,9 +16,7 @@ import Control.Applicative ((<$>))
 
 
 clean :: [LiNamePath] -> IO ()
-clean xs = do
-    let dirs = nub $ map takeDirectory xs
-    mapM_ rmDir dirs
+clean xs = mapM_ rmDir $ nub $ map takeDirectory xs
 
 
 rmDir :: LiNamePath -> IO ()
@@ -27,5 +26,5 @@ rmDir "." = return ()
 rmDir p   = do
     exist <- doesDirectoryExist p
     when exist $ do
-      empty <- null <$> getDirectoryContents p
-      when empty $ print p >> removeDirectory p >> rmDir (takeDirectory p)
+      empty <- null <$> filter notDots <$> getDirectoryContents p
+      when empty $ removeDirectory p >> rmDir (takeDirectory p)

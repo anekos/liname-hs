@@ -6,6 +6,7 @@ module LiName.Loader (
 ) where
 
 import LiName.Types
+import LiName.Utils
 
 import Control.Applicative ((<$>))
 import System.Directory (getDirectoryContents)
@@ -30,10 +31,6 @@ loadPath' fps = concat <$> mapM loadPath fps
 
 ls :: FilePath -> IO [FilePath]
 ls dir = map (combine dir) <$> filter notDots <$> getDirectoryContents dir
-  where
-    notDots "."  = False
-    notDots ".." = False
-    notDots _    = True
 
 
 loadDirectory :: FilePath -> IO [LiNamePath]
