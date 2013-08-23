@@ -31,10 +31,11 @@ main = do
     ss :: [LiNameSource] <- makeSources <$> (loadPath' =<< getArgs)
     es' <- map (parseEntry "<TEMP>") <$> edit (def^.editorCommand) (map sourceLine ss)
     results <- forM (rights es') $ process conf (fromList ss)
+    clean $ rights results
     putResult ss (rights es') results
 
 
-putResult :: [LiNameSource] -> [LiNameEntry] -> [Either String ()] -> IO ()
+putResult :: [LiNameSource] -> [LiNameEntry] -> [Either String LiNamePath] -> IO ()
 putResult ss es rs = do
     let sl = length ss
         el = length es
@@ -54,9 +55,9 @@ sourceLine :: LiNameSource -> String
 sourceLine (LiNameKey key, fp) = printf "%.4d\t%s" key $ toString $ escape $ fromString fp
 
 
-process :: LiNameConfig -> Map LiNameKey LiNamePath -> LiNameEntry -> IO (Either String ())
+process :: LiNameConfig -> Map LiNameKey LiNamePath -> LiNameEntry -> IO (Either String LiNamePath)
 process conf sm (LiNameEntry {_entryKey = k, _action = a })
-    | Just fp <- lookup k sm = doAction conf a fp
+    | Just fp <- lookup k sm = (>> Right fp) <$> doAction conf a fp
     | otherwise              = return $ Left $ "Not found key: " ++ show k
 
 

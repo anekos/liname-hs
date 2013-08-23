@@ -24,7 +24,7 @@ rmDir :: LiNamePath -> IO ()
 rmDir ""  = return ()
 rmDir "/" = return ()
 rmDir "." = return ()
-rmDir p   = do 
+rmDir p   = do
     exist <- doesDirectoryExist p
     when exist $ do
       empty <- null <$> getDirectoryContents p
