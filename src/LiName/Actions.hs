@@ -19,7 +19,7 @@ import System.FilePath.Posix (takeDirectory)
 doAction :: LiNameConfig -> LiNameAction -> LiNamePath -> IO (Either String ())
 doAction _ (DoRename t) f
     | f == t               = return $ Right ()
-    | otherwise            = msgCatch t $ createDirectoryIfMissing True (takeDirectory t) >> renameFile f t
+    | otherwise            = msgCatch t $ createDirectoryIfMissing True (takeDirectory t) >> moveFile f t
 doAction _ (DoCopy t) f
     | f == t               = return $ Right ()
     | otherwise            = msgCatch t $ createDirectoryIfMissing True (takeDirectory t) >> copyFile f t
@@ -30,6 +30,10 @@ doAction c DoTrash  f      = msgCatch f $ fromExitCode <$> run (c^.trashCommand)
 fromExitCode :: ExitCode -> Either String ()
 fromExitCode ExitSuccess      = Right ()
 fromExitCode (ExitFailure x)  = Left $ "ExitCode: " ++ show x
+
+
+moveFile :: FilePath -> FilePath -> IO ()
+moveFile f t = renameFile f t `catchIOError` const (copyFile f t >> removeFile f)
 
 
 msgCatch :: LiNamePath -> IO a -> IO (Either String ())
