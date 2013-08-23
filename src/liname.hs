@@ -2,6 +2,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
 import LiName.Actions
+import LiName.Clean
 import LiName.Command
 import LiName.Config
 import LiName.Loader
