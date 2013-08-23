@@ -8,7 +8,7 @@ import LiName.Types
 
 import Control.Applicative ((<$>))
 import Control.Lens
-import System.Directory (getTemporaryDirectory)
+import System.Directory (getTemporaryDirectory, removeFile)
 import System.Exit (ExitCode(..))
 import System.IO (hClose, hPutStr, openTempFile)
 import System.Process (waitForProcess, runProcess)
@@ -25,7 +25,9 @@ edit :: LiNameCommand -> [String] -> IO [String]
 edit cmd contents = do
     fn <- makeTempFile contents
     run cmd fn
-    lines <$> readFile fn
+    ls <- lines <$> readFile fn
+    removeFile fn
+    return ls
 
 
 makeTempFile :: [String] -> IO String
