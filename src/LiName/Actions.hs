@@ -8,13 +8,16 @@ import LiName.Types
 import LiName.Command
 
 import Control.Applicative ((<$>))
-import Control.Lens
-import System.Directory (copyFile, createDirectoryIfMissing, doesDirectoryExist, doesFileExist, removeFile, renameFile)
-import System.Exit (ExitCode(ExitSuccess, ExitFailure))
-import System.IO.Error (catchIOError)
-import System.FilePath.Posix (takeDirectory)
 import Control.Exception (throwIO)
+import Control.Lens hiding ((<.>))
 import Control.Monad (when)
+import Data.Time.Clock (addUTCTime, getCurrentTime)
+import Freedesktop.Trash(TrashFile(..), getTrashPaths, moveToTrash)
+import System.Directory (canonicalizePath, copyFile, createDirectoryIfMissing, doesDirectoryExist, doesFileExist, removeFile, renameFile)
+import System.Exit (ExitCode(ExitSuccess, ExitFailure))
+import System.FilePath.Posix ((<.>), (</>), takeDirectory, takeFileName)
+import System.FilePath.Posix (takeDirectory)
+import System.IO.Error (catchIOError)
 
 
 
@@ -27,6 +30,18 @@ doAction _ (DoCopy t) f
     | otherwise            = msgCatch t $ checkExistingFile t $ createDirectoryIfMissing True (takeDirectory t) >> copyFile f t
 doAction _ DoDelete f      = msgCatch f $ removeFile f
 doAction c DoTrash  f      = msgCatch f $ fromExitCode <$> run (c^.trashCommand) f
+
+
+trash :: LiNamePath -> IO ()
+trash fp = do
+    afp <- canonicalizePath fp
+    (ipath, fpath) <- getTrashPaths
+    time <- fmap (addUTCTime 0) getCurrentTime
+    moveToTrash $ TrashFile (ipath </> takeFileName fp <.> "trashinfo")
+                            (fpath </> takeFileName fp)
+                            afp
+                            time
+                            0
 
 
 fromExitCode :: ExitCode -> Either String ()
