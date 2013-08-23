@@ -40,10 +40,10 @@ putResult ss es rs = do
         rrl = length $ rights rs
         rll = length $ lefts rs
     putStrLn "Results"
-    putStrLn $ indent "input: " ++ show sl
-    putStrLn $ indent "try: " ++ show el
-    putStrLn $ indent "success: " ++ show rrl
-    putStrLn $ indent "fail: " ++ show rll
+    putStrLn $ printf (indent "input:    %4d") sl
+    putStrLn $ printf (indent "try:      %4d") el
+    putStrLn $ printf (indent "success:  %4d") rrl
+    putStrLn $ printf (indent "fail:     %4d") rll
     when (rll > 0) $ do
       hPutStrLn stderr "Fails"
       mapM_ (hPutStrLn stderr . indent) $ lefts rs
