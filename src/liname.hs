@@ -26,8 +26,12 @@ import Text.ShellEscape (escape)
 
 
 main :: IO ()
-main = do
-    (conf, pathArgs) <- getConf
+main = getConf >>= main'
+
+
+main' :: Either String (LiNameConfig, [String]) -> IO ()
+main' (Left err)               = hPutStrLn stderr err
+main' (Right (conf, pathArgs)) = do
     ss :: [LiNameSource] <- makeSources <$> loadPath' pathArgs
     es' <- map (parseEntry "<TEMP>") <$> edit (def^.editorCommand) (map sourceLine ss)
     results <- forM (rights es') $ process conf (fromList ss)
@@ -35,7 +39,7 @@ main = do
     putResult ss (rights es') results
 
 
-getConf :: IO (LiNameConfig, [String])
+getConf :: IO (Either String (LiNameConfig, [String]))
 getConf = do
     fileConf <- loadConfigFile
     getArgs >>= parseOptions fileConf

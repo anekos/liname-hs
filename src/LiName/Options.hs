@@ -17,9 +17,11 @@ options =
    ]
 
 
-parseOptions :: LiNameConfig -> [String] -> IO (LiNameConfig, [String])
+parseOptions :: LiNameConfig -> [String] -> IO (Either String (LiNameConfig, [String]))
 parseOptions conf argv =
     case getOpt Permute options argv of
-       (o, n, [])   -> return (foldl (flip id) conf o, n)
-       (_, _, errs) -> ioError $ userError (concat errs ++ usageInfo header options)
+       (_, [], es) -> usage es
+       (o, n, [])  -> return $ Right (foldl (flip id) conf o, n)
+       (_, _, es)  -> usage es
   where header = "Usage: liname [OPTION...] <PATH>..."
+        usage errs = return $ Left $ concat errs ++ usageInfo header options
