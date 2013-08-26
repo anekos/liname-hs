@@ -29,5 +29,6 @@ parseOptions' _ (_, [], es) = return $ Left $ usage es
 parseOptions' c (o, n, [])  = return $ Right (foldl (flip id) c o, n)
 parseOptions' _ (_, _, es)  = return $ Left $ usage es
 
+
 usage :: [String] -> String
 usage errs = concat errs ++ usageInfo header options
