@@ -8,6 +8,7 @@ module LiName.Config (
 
 import LiName.Types
 
+import Prelude hiding (lookup)
 import Control.Exception
 import Control.Lens
 import Data.Default (def)
@@ -25,7 +26,9 @@ loadConfigFile = do
     y <- load $ combine home ".liname.yaml"
     ec <- makeCommand' y "editor" editorCommandDefault
     tc <- makeCommand' y "trash" trashCommandDefault
-    return LiNameConfig { _editorCommand = ec, _trashCommand = tc }
+    return $ def { _editorCommand = ec
+                 , _trashCommand = tc
+                 , _squash = lookup y (pack "squash") }
   `catch`
     catchAndReturnDefault def
 

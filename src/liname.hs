@@ -6,6 +6,7 @@ import LiName.Clean
 import LiName.Command
 import LiName.Config
 import LiName.Loader
+import LiName.Options
 import LiName.Parsers
 import LiName.Types
 
@@ -26,12 +27,18 @@ import Text.ShellEscape (escape)
 
 main :: IO ()
 main = do
-    conf <- loadConfigFile
-    ss :: [LiNameSource] <- makeSources <$> (loadPath' =<< getArgs)
-    es' <- map (parseEntry "<TEMP>") <$> edit (conf^.editorCommand) (map sourceLine ss)
+    (conf, pathArgs) <- getConf
+    ss :: [LiNameSource] <- makeSources <$> loadPath' pathArgs
+    es' <- map (parseEntry "<TEMP>") <$> edit (def^.editorCommand) (map sourceLine ss)
     results <- forM (rights es') $ process conf (fromList ss)
     clean $ rights results
     putResult ss (rights es') results
+
+
+getConf :: IO (LiNameConfig, [String])
+getConf = do
+    fileConf <- loadConfigFile
+    getArgs >>= parseOptions fileConf
 
 
 putResult :: [LiNameSource] -> [LiNameEntry] -> [Either String LiNamePath] -> IO ()
