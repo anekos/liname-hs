@@ -33,7 +33,8 @@ main = getConf >>= main'
 main' :: Either String (LiNameConfig, [String]) -> IO ()
 main' (Left err)               = hPutStrLn stderr err
 main' (Right (conf, pathArgs)) = do
-    ss :: [LiNameSource] <- (makeSources . compactPath' (conf^.compact)) <$> loadPath' pathArgs
+    (common, ps) <- compactPath' (conf^.compact) <$> loadPath' pathArgs
+    let ss = makeSources ps
     es' <- map (parseEntry "<TEMP>") <$> edit (def^.editorCommand) (map sourceLine ss)
     results <- forM (rights es') $ process conf (fromList ss)
     clean $ rights results

@@ -1,4 +1,6 @@
 
+{-# LANGUAGE TupleSections #-}
+
 module LiName.Path (
   compactPath'
 ) where
@@ -24,12 +26,12 @@ commonPathLevel :: [[String]] -> Int
 commonPathLevel = length . commonPath'
 
 
-compactPath :: Int -> [String] -> [String]
-compactPath lv xs = map (joinPath . compact) ps
-  where
-    ps = map splitDirectories xs
-    compact = drop $ max 0 $ commonPathLevel ps - lv
+compactPath :: Int -> [String] -> (String, [String])
+compactPath lv xs = let ps = map splitDirectories xs
+                        cp = commonPath' ps
+                        cut = drop $ max 0 $ length cp - lv
+                    in  (joinPath cp, map joinPath $ map cut ps)
 
 
-compactPath' :: Maybe Int -> [String] -> [String]
-compactPath' = maybe id compactPath
+compactPath' :: Maybe Int -> [String] -> (String, [String])
+compactPath' = maybe (("",) . id) compactPath
