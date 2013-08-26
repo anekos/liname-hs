@@ -12,21 +12,29 @@ import Control.Lens
 import System.Directory (copyFile, createDirectoryIfMissing, doesDirectoryExist, doesFileExist, removeFile, renameFile)
 import System.Exit (ExitCode(ExitSuccess, ExitFailure))
 import System.IO.Error (catchIOError)
-import System.FilePath.Posix (takeDirectory)
+import System.FilePath.Posix ((</>), takeDirectory)
 import Control.Exception (throwIO)
 import Control.Monad (when)
 
 
 
-doAction :: LiNameConfig -> LiNameAction -> LiNamePath -> IO (Either String ())
-doAction _ (DoRename t) f
-    | f == t               = return $ Right ()
-    | otherwise            = msgCatch t $ checkExistingFile t $ createDirectoryIfMissing True (takeDirectory t) >> moveFile f t
-doAction _ (DoCopy t) f
-    | f == t               = return $ Right ()
-    | otherwise            = msgCatch t $ checkExistingFile t $ createDirectoryIfMissing True (takeDirectory t) >> copyFile f t
-doAction _ DoDelete f      = msgCatch f $ removeFile f
-doAction c DoTrash  f      = msgCatch f $ fromExitCode <$> run (c^.trashCommand) f
+doAction :: LiNameConfig -> LiNamePath -> LiNameAction -> LiNamePath -> IO (Either String ())
+doAction _ cp (DoRename t) f  = doRename (cp </> f) (cp </> t)
+doAction _ cp (DoCopy t) f    = doCopy (cp </> f) (cp </> t)
+doAction _ cp DoDelete f      = msgCatch f $ removeFile (cp </> f)
+doAction c cp DoTrash  f      = msgCatch f $ fromExitCode <$> run (c^.trashCommand) (cp </> f)
+
+
+doRename :: LiNamePath -> LiNamePath -> IO (Either String ())
+doRename f t
+    | f == t    = return $ Right ()
+    | otherwise = msgCatch t $ checkExistingFile t $ createDirectoryIfMissing True (takeDirectory t) >> moveFile f t
+
+
+doCopy :: LiNamePath -> LiNamePath -> IO (Either String ())
+doCopy f t
+    | f == t    = return $ Right ()
+    | otherwise = msgCatch t $ checkExistingFile t $ createDirectoryIfMissing True (takeDirectory t) >> copyFile f t
 
 
 fromExitCode :: ExitCode -> Either String ()
