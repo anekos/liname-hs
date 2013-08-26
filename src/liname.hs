@@ -8,6 +8,7 @@ import LiName.Config
 import LiName.Loader
 import LiName.Options
 import LiName.Parsers
+import LiName.Path
 import LiName.Types
 
 import Prelude hiding (lookup)
@@ -33,7 +34,7 @@ main' :: Either String (LiNameConfig, [String]) -> IO ()
 main' (Left err)               = hPutStrLn stderr err
 main' (Right (conf, pathArgs)) = do
     ss :: [LiNameSource] <- makeSources <$> loadPath' pathArgs
-    es' <- map (parseEntry "<TEMP>") <$> edit (def^.editorCommand) (map sourceLine ss)
+    es' <- map (parseEntry "<TEMP>") <$> edit (def^.editorCommand) (compactPath' (conf^.compact) $ map sourceLine ss)
     results <- forM (rights es') $ process conf (fromList ss)
     clean $ rights results
     putResult ss (rights es') results

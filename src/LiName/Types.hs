@@ -33,13 +33,13 @@ data LiNameCommand = LiNameCommand
 data LiNameConfig = LiNameConfig
                   { _editorCommand :: LiNameCommand
                   , _trashCommand :: LiNameCommand
-                  , _squash :: Maybe Int } deriving Show
+                  , _compact :: Maybe Int } deriving Show
 
 
 instance Default LiNameConfig where
     def = LiNameConfig { _editorCommand = editorCommandDefault
                        , _trashCommand = trashCommandDefault
-                       , _squash = Nothing }
+                       , _compact = Nothing }
 
 
 editorCommandDefault, trashCommandDefault :: LiNameCommand

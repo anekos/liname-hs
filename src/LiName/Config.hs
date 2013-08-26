@@ -28,7 +28,7 @@ loadConfigFile = do
     tc <- makeCommand' y "trash" trashCommandDefault
     return $ def { _editorCommand = ec
                  , _trashCommand = tc
-                 , _squash = lookup y (pack "squash") }
+                 , _compact = lookup y (pack "compact") }
   `catch`
     catchAndReturnDefault def
 
