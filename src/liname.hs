@@ -20,6 +20,8 @@ import Data.Map (Map, fromList)
 import Data.Map.Lazy (lookup)
 import System.Environment (getArgs)
 import System.IO (hPutStrLn, stderr)
+import System.Posix.Files (getFdStatus, isNamedPipe)
+import System.Posix.IO (stdInput)
 import Text.Printf (printf)
 import Text.ShellEscape (escape)
 
@@ -42,7 +44,10 @@ main' (Right (conf, pathArgs)) = do
 getConf :: IO (Either String (LiNameConfig, [String]))
 getConf = do
     fileConf <- loadConfigFile
-    getArgs >>= parseOptions fileConf
+    as <- getArgs
+    fd <- getFdStatus stdInput
+    pas <- if isNamedPipe fd then lines <$> getContents else return []
+    parseOptions fileConf $ as ++ pas
 
 
 putResult :: [LiNameSource] -> [LiNameEntry] -> [Either String LiNamePath] -> IO ()
