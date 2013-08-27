@@ -1,3 +1,4 @@
 *.hi
 *.o
 src/liname
+cabal-dev/
