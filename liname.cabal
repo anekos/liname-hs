@@ -23,6 +23,7 @@ copyright:           anekos <liname-hs@snca.net>
 -- category:            <NONE>
 build-type:          Simple
 cabal-version:       >=1.10
+stability:           experimental
 
 
 executable liname
