@@ -20,6 +20,7 @@ actionParser = do name <- many $ noneOf "0123456789"
                   case name of
                     "!!" -> return $ const DoDelete
                     "!" -> return $ const DoTrash
+                    "=" -> return DoCopy
                     "" -> return DoRename
                     _ -> unexpected name
 
