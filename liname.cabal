@@ -14,12 +14,17 @@ version:             0.1.0.0
 
 synopsis:            Rename files and directories by text editor.
 description:         Rename files and directories by text editor.
-homepage:            Rename files and directories by text editor
+
+author:              anekos
+maintainer:          anekos <liname-hs@snca.net>
+copyright:           anekos <liname-hs@snca.net>
+
+homepage:            https://github.com/anekos/liname-hs/
+bug-reports:         https://github.com/anekos/liname-hs/issues
+
 license:             GPL-3
 license-file:        LICENSE
-author:              anekos
-maintainer:          liname-hs@snca.net
-copyright:           anekos <liname-hs@snca.net>
+
 -- category:            <NONE>
 build-type:          Simple
 cabal-version:       >=1.10
