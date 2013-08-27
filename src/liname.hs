@@ -1,6 +1,8 @@
 
 {-# LANGUAGE ScopedTypeVariables #-}
 
+module Main (main) where
+
 import LiName.Actions
 import LiName.Clean
 import LiName.Command
