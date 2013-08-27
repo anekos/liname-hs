@@ -23,6 +23,10 @@ spec = do
         parseEntry fn "023\tCAT" `shouldBe` (Right $ LiNameEntry (LiNameKey 23) (DoRename "CAT"))
         parseEntry fn "023\t\tCAT" `shouldBe` (Right $ LiNameEntry (LiNameKey 23) (DoRename "\tCAT"))
         parseEntry fn "023\t CAT" `shouldBe` (Right $ LiNameEntry (LiNameKey 23) (DoRename " CAT"))
+      it "Copy" $ do
+        parseEntry fn "=023\tCAT" `shouldBe` (Right $ LiNameEntry (LiNameKey 23) (DoCopy "CAT"))
+        parseEntry fn "=023\t\tCAT" `shouldBe` (Right $ LiNameEntry (LiNameKey 23) (DoCopy "\tCAT"))
+        parseEntry fn "=023\t CAT" `shouldBe` (Right $ LiNameEntry (LiNameKey 23) (DoCopy " CAT"))
       it "Trash" $ do
         parseEntry fn "!023\tCAT" `shouldBe` (Right $ LiNameEntry (LiNameKey 23) DoTrash)
         parseEntry fn "!023\t\tCAT" `shouldBe` (Right $ LiNameEntry (LiNameKey 23) DoTrash)
