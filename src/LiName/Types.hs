@@ -32,6 +32,8 @@ data LiNameCommand = LiNameCommand
 
 data LiNameSortType = SortByFileName
                     | SortByFilePath
+                    | SortByFileNameI
+                    | SortByFilePathI
                     | SortByModTime
                     | DontSort
                     | InvertedSort LiNameSortType deriving Show

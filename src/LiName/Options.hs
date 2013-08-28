@@ -36,5 +36,7 @@ readSortType ('i':xs) = InvertedSort $ readSortType xs
 readSortType "m"      = SortByModTime
 readSortType "n"      = SortByFileName
 readSortType "p"      = SortByFilePath
+readSortType "N"      = SortByFileNameI
+readSortType "P"      = SortByFilePathI
 readSortType "-"      = DontSort
 readSortType _        = DontSort
