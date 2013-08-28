@@ -4,6 +4,7 @@ module LiName.Options (
 ) where
 
 import LiName.Types
+import LiName.Sort
 
 import System.Console.GetOpt
 
@@ -11,9 +12,14 @@ import System.Console.GetOpt
 
 options :: [OptDescr (LiNameConfig -> LiNameConfig)]
 options =
-   [ Option "s" ["squash"]
-       (ReqArg (\value opts -> opts { _squash = Just $ read value }) "LEVEL")
-       "Squash directory part"
+   [ Option "s" ["sort"]
+       (ReqArg (\value opts -> opts { _sortType = readSortType value }) "SORT_TYPE")
+       (unlines [ "Sort type: m = modification time"
+                , "           n = file name"
+                , "           p = file path"
+                , "           N = file name (case insesitve)"
+                , "           P = file path (case insesitve)"
+                , "           iX = inverted X" ])
    ]
 
 

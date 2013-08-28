@@ -7,6 +7,7 @@ module LiName.Config (
 
 
 import LiName.Types
+import LiName.Sort
 
 import Prelude hiding (lookup)
 import Control.Exception
@@ -28,7 +29,8 @@ loadConfigFile = do
     tc <- makeCommand' y "trash" trashCommandDefault
     return $ def { _editorCommand = ec
                  , _trashCommand = tc
-                 , _squash = lookup y (pack "squash") }
+                 , _squash = lookup y (pack "squash")
+                 , _sortType = maybe DontSort readSortType $ lookup y (pack "sort") }
   `catch`
     catchAndReturnDefault def
 
