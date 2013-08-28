@@ -4,6 +4,7 @@ module LiName.Options (
 ) where
 
 import LiName.Types
+import LiName.Sort
 
 import System.Console.GetOpt
 
@@ -30,15 +31,3 @@ parseOptions conf argv =
        (_, _, es)  -> usage es
   where header = "Usage: liname [OPTION...] <PATH>..."
         usage errs = return $ Left $ concat errs ++ usageInfo header options
-
-
--- FIXME Error should occurs for unknow type.
-readSortType :: String -> LiNameSortType
-readSortType ('i':xs) = InvertedSort $ readSortType xs
-readSortType "m"      = SortByModTime
-readSortType "n"      = SortByFileName
-readSortType "p"      = SortByFilePath
-readSortType "N"      = SortByFileNameI
-readSortType "P"      = SortByFilePathI
-readSortType "-"      = DontSort
-readSortType _        = DontSort

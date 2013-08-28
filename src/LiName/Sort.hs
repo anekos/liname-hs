@@ -2,6 +2,7 @@
 {-# LANGUAGE Rank2Types, ScopedTypeVariables, TupleSections #-}
 
 module LiName.Sort (
+  readSortType,
   sortPathList
 ) where
 
@@ -13,6 +14,19 @@ import System.Directory (getModificationTime)
 import Control.Applicative ((<$>))
 import Control.Monad (liftM)
 import Data.Text (pack, toLower, Text)
+
+
+
+-- FIXME Error should occurs for unknow type.
+readSortType :: String -> LiNameSortType
+readSortType ('i':xs) = InvertedSort $ readSortType xs
+readSortType "m"      = SortByModTime
+readSortType "n"      = SortByFileName
+readSortType "p"      = SortByFilePath
+readSortType "N"      = SortByFileNameI
+readSortType "P"      = SortByFilePathI
+readSortType "-"      = DontSort
+readSortType _        = DontSort
 
 
 sortPathList :: LiNameSortType -> [LiNamePath] -> IO [LiNamePath]
