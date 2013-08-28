@@ -42,14 +42,14 @@ data LiNameSortType = SortByFileName
 data LiNameConfig = LiNameConfig
                   { _editorCommand :: LiNameCommand
                   , _trashCommand :: LiNameCommand
-                  , _squash :: Maybe Int
+                  , _compact :: Maybe Int
                   , _sortType :: LiNameSortType } deriving Show
 
 
 instance Default LiNameConfig where
     def = LiNameConfig { _editorCommand = editorCommandDefault
                        , _trashCommand = trashCommandDefault
-                       , _squash = Nothing
+                       , _compact = Nothing
                        , _sortType = DontSort }
 
 

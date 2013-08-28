@@ -10,6 +10,7 @@ import LiName.Config
 import LiName.Loader
 import LiName.Options
 import LiName.Parsers
+import LiName.Path
 import LiName.Sort
 import LiName.Types
 
@@ -37,9 +38,10 @@ main = getConf >>= main'
 main' :: Either String (LiNameConfig, [String]) -> IO ()
 main' (Left err)               = hPutStrLn stderr err
 main' (Right (conf, pathArgs)) = do
-    ss :: [LiNameSource] <- makeSources <$> (sortPathList (conf^.sortType) =<< loadPath' pathArgs)
+    (common, ps) <- compactPath' (conf^.compact) <$> (sortPathList (conf^.sortType) =<< loadPath' pathArgs)
+    let ss = makeSources ps
     es' <- map (parseEntry "<TEMP>") <$> edit (conf^.editorCommand) (map sourceLine ss)
-    results <- forM (rights es') $ process conf (fromList ss)
+    results <- forM (rights es') $ process conf (fromList ss) common
     clean $ rights results
     putResult ss (rights es') results
 
@@ -73,9 +75,9 @@ sourceLine :: LiNameSource -> String
 sourceLine (LiNameKey key, fp) = printf "%.4d\t%s" key $ toString $ escape $ fromString fp
 
 
-process :: LiNameConfig -> Map LiNameKey LiNamePath -> LiNameEntry -> IO (Either String LiNamePath)
-process conf sm (LiNameEntry {_entryKey = k, _action = a })
-    | Just fp <- lookup k sm = (>> Right fp) <$> doAction conf a fp
+process :: LiNameConfig -> Map LiNameKey LiNamePath -> LiNamePath -> LiNameEntry -> IO (Either String LiNamePath)
+process conf sm common (LiNameEntry {_entryKey = k, _action = a })
+    | Just fp <- lookup k sm = (>> Right fp) <$> doAction conf common a fp
     | otherwise              = return $ Left $ "Not found key: " ++ show k
 
 

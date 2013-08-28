@@ -10,6 +10,10 @@ import System.Console.GetOpt
 
 
 
+header :: String
+header = "Usage: liname [OPTION...] <PATH>..."
+
+
 options :: [OptDescr (LiNameConfig -> LiNameConfig)]
 options =
    [ Option "s" ["sort"]
@@ -20,14 +24,20 @@ options =
                 , "           N = file name (case insesitve)"
                 , "           P = file path (case insesitve)"
                 , "           iX = inverted X" ])
-   ]
+   , Option "c" ["compact"]
+       (ReqArg (\value opts -> opts { _compact = Just $ read value }) "LEVEL")
+       "Compact directory part" ]
 
 
 parseOptions :: LiNameConfig -> [String] -> IO (Either String (LiNameConfig, [String]))
-parseOptions conf argv =
-    case getOpt Permute options argv of
-       (_, [], es) -> usage es
-       (o, n, [])  -> return $ Right (foldl (flip id) conf o, n)
-       (_, _, es)  -> usage es
-  where header = "Usage: liname [OPTION...] <PATH>..."
-        usage errs = return $ Left $ concat errs ++ usageInfo header options
+parseOptions conf argv = parseOptions' conf $ getOpt Permute options argv
+
+
+parseOptions' :: LiNameConfig -> ([LiNameConfig -> LiNameConfig], [String], [String]) -> IO (Either String (LiNameConfig, [String]))
+parseOptions' _ (_, [], es) = return $ Left $ usage es
+parseOptions' c (o, n, [])  = return $ Right (foldl (flip id) c o, n)
+parseOptions' _ (_, _, es)  = return $ Left $ usage es
+
+
+usage :: [String] -> String
+usage errs = concat errs ++ usageInfo header options
