@@ -13,9 +13,11 @@ options :: [OptDescr (LiNameConfig -> LiNameConfig)]
 options =
    [ Option "s" ["sort"]
        (ReqArg (\value opts -> opts { _sortType = readSortType value }) "SORT_TYPE")
-       (unlines [ "Sort type: m = mod-time"
-                , "           n = filename"
-                , "           p = filepath"
+       (unlines [ "Sort type: m = modification time"
+                , "           n = file name"
+                , "           p = file path"
+                , "           N = file name (case insesitve)"
+                , "           P = file path (case insesitve)"
                 , "           iX = inverted X" ])
    ]
 
