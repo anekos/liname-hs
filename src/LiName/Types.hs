@@ -30,16 +30,25 @@ data LiNameCommand = LiNameCommand
                    , _placeHolder  :: String } deriving Show
 
 
+data LiNameSortType = SortByFileName
+                    | SortByFilePath
+                    | SortByModTime
+                    | DontSort
+                    | InvertedSort LiNameSortType deriving Show
+
+
 data LiNameConfig = LiNameConfig
                   { _editorCommand :: LiNameCommand
                   , _trashCommand :: LiNameCommand
-                  , _squash :: Maybe Int } deriving Show
+                  , _squash :: Maybe Int
+                  , _sortType :: LiNameSortType } deriving Show
 
 
 instance Default LiNameConfig where
     def = LiNameConfig { _editorCommand = editorCommandDefault
                        , _trashCommand = trashCommandDefault
-                       , _squash = Nothing }
+                       , _squash = Nothing
+                       , _sortType = DontSort }
 
 
 editorCommandDefault, trashCommandDefault :: LiNameCommand

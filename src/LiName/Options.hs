@@ -11,9 +11,12 @@ import System.Console.GetOpt
 
 options :: [OptDescr (LiNameConfig -> LiNameConfig)]
 options =
-   [ Option "s" ["squash"]
-       (ReqArg (\value opts -> opts { _squash = Just $ read value }) "LEVEL")
-       "Squash directory part"
+   [ Option "s" ["sort"]
+       (ReqArg (\value opts -> opts { _sortType = readSortType value }) "SORT_TYPE")
+       (unlines [ "Sort type: m = mod-time"
+                , "           n = filename"
+                , "           p = filepath"
+                , "           iX = inverted X" ])
    ]
 
 
@@ -25,3 +28,13 @@ parseOptions conf argv =
        (_, _, es)  -> usage es
   where header = "Usage: liname [OPTION...] <PATH>..."
         usage errs = return $ Left $ concat errs ++ usageInfo header options
+
+
+-- FIXME Error should occurs for unknow type.
+readSortType :: String -> LiNameSortType
+readSortType ('i':xs) = InvertedSort $ readSortType xs
+readSortType "m"      = SortByModTime
+readSortType "n"      = SortByFileName
+readSortType "p"      = SortByFilePath
+readSortType "-"      = DontSort
+readSortType _        = DontSort
