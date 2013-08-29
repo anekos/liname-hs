@@ -53,6 +53,11 @@ instance Default LiNameConfig where
                        , _sortType = DontSort }
 
 
+type LiNameSuccess = (LiNameEntry, LiNamePath)
+type LiNameFail = (LiNameEntry, String)
+type LiNameResult = Either LiNameFail LiNameSuccess
+
+
 editorCommandDefault, trashCommandDefault :: LiNameCommand
 editorCommandDefault = LiNameCommand "gvim" ["--nofork", "%"] "%"
 trashCommandDefault  = LiNameCommand "false" [] "%"
