@@ -11,6 +11,9 @@ t:
 	cabal build
 	cabal test
 
+d:
+	cabal install --enable-test --only-dependencies
+
 l: build
 	hlint src
 
