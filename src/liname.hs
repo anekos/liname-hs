@@ -41,9 +41,16 @@ main' (Left err)               = hPutStrLn stderr err
 main' (Right (conf, pathArgs)) = do
     (common, ps) <- compactPath' (conf^.compact) <$> (sortPathList (conf^.sortType) =<< loadPath' pathArgs)
     let ss = makeSources ps
-    results <- edit (conf^.editorCommand) (map sourceLine ss) >>= mapM (process conf (fromList ss) common)
-    clean $ map snd $ rights results
-    putResult (length ss) results
+        sm = fromList ss
+    results <- editAndProcess conf (map sourceLine ss) sm common
+    retry conf sm common $ lefts results
+
+
+retry :: LiNameConfig -> Map LiNameKey LiNamePath -> String -> [LiNameFail] -> IO ()
+retry _ _ _ [] = return ()
+retry conf sm common fails = do
+    results <- editAndProcess conf (map fst fails) sm common
+    retry conf sm common $ lefts results
 
 
 getConf :: IO (Either String (LiNameConfig, [String]))
@@ -72,6 +79,13 @@ sourceLine :: LiNameSource -> String
 sourceLine (LiNameKey key, fp) = printf "%.4d\t%s" key $ toString $ escape $ fromString fp
 
 
+editAndProcess :: LiNameConfig -> [String] -> Map LiNameKey LiNamePath -> String -> IO [LiNameResult]
+editAndProcess conf ss sm common = do
+    results <- edit (conf^.editorCommand) ss >>= mapM (process conf sm common)
+    clean $ map snd $ rights results
+    putResult (length ss) results
+    return results
+
 process :: LiNameConfig -> Map LiNameKey LiNamePath -> LiNamePath -> String -> IO LiNameResult
 process conf sm common line =
     case readLine line of
@@ -83,7 +97,7 @@ process conf sm common line =
                 r <- doAction conf common (entry^.action) fp
                 case r of
                   Right ()  -> return $ Right (entry, fp)
-                  Left err' -> return $ Left (fp, err')
+                  Left err' -> return $ Left (line, err')
 
 
 readLine :: String -> Either LiNameFail LiNameEntry
