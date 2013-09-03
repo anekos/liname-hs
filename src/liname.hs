@@ -1,5 +1,5 @@
 
-{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE ScopedTypeVariables, TupleSections #-}
 
 module Main (main) where
 
@@ -14,12 +14,13 @@ import LiName.Path
 import LiName.Sort
 import LiName.Types
 
-import Prelude hiding (lookup)
+import Prelude hiding (lookup, fail)
 import Control.Applicative ((<$>))
 import Control.Lens
-import Control.Monad (forM, when)
+import Control.Monad (when)
 import Data.ByteString.UTF8 (fromString, toString)
 import Data.Either (lefts, rights)
+import Data.Either.Unwrap (mapLeft)
 import Data.Map (Map, fromList)
 import Data.Map.Lazy (lookup)
 import System.Environment (getArgs)
@@ -40,8 +41,7 @@ main' (Left err)               = hPutStrLn stderr err
 main' (Right (conf, pathArgs)) = do
     (common, ps) <- compactPath' (conf^.compact) <$> (sortPathList (conf^.sortType) =<< loadPath' pathArgs)
     let ss = makeSources ps
-    es' <- map (parseEntry "<TEMP>") <$> edit (conf^.editorCommand) (map sourceLine ss)
-    results <- forM (rights es') $ process conf (fromList ss) common
+    results <- edit (conf^.editorCommand) (map sourceLine ss) >>= mapM (process conf (fromList ss) common)
     clean $ map snd $ rights results
     putResult (length ss) results
 
@@ -72,13 +72,26 @@ sourceLine :: LiNameSource -> String
 sourceLine (LiNameKey key, fp) = printf "%.4d\t%s" key $ toString $ escape $ fromString fp
 
 
-process :: LiNameConfig -> Map LiNameKey LiNamePath -> LiNamePath -> LiNameEntry -> IO LiNameResult
-process conf sm common e@(LiNameEntry {_entryKey = k, _action = a })
-    | Just fp <- lookup k sm = found fp <$> doAction conf common a fp
-    | otherwise              = return $ Left (e, "Not found key: " ++ show k)
-  where
-    found fp (Right _)  = Right (e, fp)
-    found _  (Left err) = Left (e, err)
+process :: LiNameConfig -> Map LiNameKey LiNamePath -> LiNamePath -> String -> IO LiNameResult
+process conf sm common line =
+    case readLine line of
+      Left fail   -> return $ Left fail
+      Right entry ->
+          case findPath sm entry of
+            Nothing    -> return $ Left (line, "Not found key: " ++ show (entry^.entryKey))
+            Just fp  -> do
+                r <- doAction conf common (entry^.action) fp
+                case r of
+                  Right ()  -> return $ Right (entry, fp)
+                  Left err' -> return $ Left (fp, err')
+
+
+readLine :: String -> Either LiNameFail LiNameEntry
+readLine line = mapLeft ((line,) . show) $ parseEntry "" line
+
+
+findPath :: Map LiNameKey LiNamePath -> LiNameEntry -> Maybe LiNamePath
+findPath sm entry = lookup (entry^.entryKey) sm
 
 
 indent :: String -> String

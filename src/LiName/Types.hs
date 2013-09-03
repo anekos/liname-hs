@@ -54,7 +54,7 @@ instance Default LiNameConfig where
 
 
 type LiNameSuccess = (LiNameEntry, LiNamePath)
-type LiNameFail = (LiNameEntry, String)
+type LiNameFail = (String, String)  -- (SourceLine, ErrorDescription)
 type LiNameResult = Either LiNameFail LiNameSuccess
 
 

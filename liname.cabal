@@ -38,6 +38,7 @@ executable liname
                        containers       == 0.5.*,
                        data-default     == 0.5.*,
                        directory        == 1.2.*,
+                       either-unwrap    == 1.1.*,
                        filepath         == 1.3.*,
                        lens             == 3.9.*,
                        parsec           == 3.1.*,
