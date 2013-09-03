@@ -17,7 +17,7 @@ import LiName.Types
 import Prelude hiding (lookup, fail)
 import Control.Applicative ((<$>))
 import Control.Lens
-import Control.Monad (when)
+import Control.Monad (unless)
 import Data.ByteString.UTF8 (fromString, toString)
 import Data.Either (lefts, rights)
 import Data.Either.Unwrap (mapLeft)
@@ -70,7 +70,7 @@ putResult inputs rs = do
     putStrLn $ printf (indent "try:      %4d") $ length rs
     putStrLn $ printf (indent "success:  %4d") $ length $ rights rs
     putStrLn $ printf (indent "fail:     %4d") $ length fails
-    when (null fails) $ do
+    unless (null fails) $ do
       hPutStrLn stderr "Fails"
       mapM_ (hPutStrLn stderr . indent . snd) fails
 
