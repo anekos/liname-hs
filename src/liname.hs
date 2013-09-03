@@ -86,6 +86,7 @@ editAndProcess conf ss sm common = do
     putResult (length ss) results
     return results
 
+
 process :: LiNameConfig -> Map LiNameKey LiNamePath -> LiNamePath -> String -> IO LiNameResult
 process conf sm common line =
     case readLine line of
