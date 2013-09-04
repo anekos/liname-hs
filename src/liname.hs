@@ -18,7 +18,6 @@ import Prelude hiding (lookup, fail)
 import Control.Applicative ((<$>))
 import Control.Lens
 import Control.Monad (unless)
-import Data.ByteString.UTF8 (fromString, toString)
 import Data.Either (lefts, rights)
 import Data.Either.Unwrap (mapLeft)
 import Data.Map (Map, fromList)
@@ -28,7 +27,6 @@ import System.IO (hPutStrLn, stderr)
 import System.Posix.Files (getFdStatus, isNamedPipe)
 import System.Posix.IO (stdInput)
 import Text.Printf (printf)
-import Text.ShellEscape (escape)
 
 
 
@@ -76,7 +74,7 @@ putResult inputs rs = do
 
 
 sourceLine :: LiNameSource -> String
-sourceLine (LiNameKey key, fp) = printf "%.4d\t%s" key $ toString $ escape $ fromString fp
+sourceLine (LiNameKey key, fp) = printf "%.4d\t%s" key fp
 
 
 editAndProcess :: LiNameConfig -> [String] -> Map LiNameKey LiNamePath -> String -> IO [LiNameResult]
