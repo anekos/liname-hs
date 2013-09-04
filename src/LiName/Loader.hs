@@ -1,4 +1,6 @@
 
+{-# LANGUAGE OverloadedStrings #-}
+
 module LiName.Loader (
   loadPath,
   loadPath',
@@ -9,6 +11,7 @@ import LiName.Types
 import LiName.Utils
 
 import Control.Applicative ((<$>))
+import Data.Text (pack, stripPrefix, unpack)
 import System.Directory (getDirectoryContents)
 import System.FilePath (combine)
 import System.Posix.Files (getFileStatus, isDirectory, isRegularFile)
@@ -38,4 +41,8 @@ loadDirectory dir = concat <$> (ls dir >>= mapM loadPath)
 
 
 makeSources:: [FilePath] -> [LiNameSource]
-makeSources= zip $ map LiNameKey [0..]
+makeSources = zip (map LiNameKey [0..]) . map cleanPath
+
+
+cleanPath :: LiNamePath -> LiNamePath
+cleanPath fp = maybe fp unpack $ stripPrefix "./" $ pack fp
