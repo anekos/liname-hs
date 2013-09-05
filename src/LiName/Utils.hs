@@ -1,7 +1,9 @@
 
+{-# LANGUAGE OverloadedStrings #-}
+
 module LiName.Utils where
 
-import Data.Text (pack, unpack, Text())
+import Data.Text (replace, pack, unpack, Text)
 
 
 
@@ -14,3 +16,6 @@ notDots _    = True
 byText :: (Text -> Text) -> String -> String
 byText f = unpack . f . pack
 
+
+unbreak :: String -> String
+unbreak = byText $ replace "\n" " "

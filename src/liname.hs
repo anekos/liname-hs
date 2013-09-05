@@ -23,7 +23,6 @@ import Data.Either (lefts, rights)
 import Data.Either.Unwrap (mapLeft)
 import Data.Map (Map, fromList)
 import Data.Map.Lazy (lookup)
-import Data.Text (replace)
 import System.Environment (getArgs)
 import System.IO (hPutStrLn, stderr)
 import System.Posix.Files (getFdStatus, isNamedPipe)
@@ -72,7 +71,7 @@ putResult inputs rs = do
     putStrLn $ printf (indent "fail:     %4d") $ length fails
     unless (null fails) $ do
       hPutStrLn stderr "Fails"
-      forM_ fails $ \(line, err) -> hPutStrLn stderr $ indent line ++ "\n" ++ indent ('\t' : byText (replace "\n" " ") err)
+      forM_ fails $ \(line, err) -> hPutStrLn stderr $ indent line ++ "\n" ++ indent ('\t' : unbreak err)
 
 
 sourceLine :: LiNameSource -> String
