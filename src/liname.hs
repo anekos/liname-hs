@@ -1,5 +1,5 @@
 
-{-# LANGUAGE ScopedTypeVariables, TupleSections #-}
+{-# LANGUAGE ScopedTypeVariables, TupleSections, OverloadedStrings #-}
 
 module Main (main) where
 
@@ -13,15 +13,17 @@ import LiName.Parsers
 import LiName.Path
 import LiName.Sort
 import LiName.Types
+import LiName.Utils
 
 import Prelude hiding (lookup, fail)
 import Control.Applicative ((<$>))
 import Control.Lens
-import Control.Monad (unless)
+import Control.Monad (forM_, unless)
 import Data.Either (lefts, rights)
 import Data.Either.Unwrap (mapLeft)
 import Data.Map (Map, fromList)
 import Data.Map.Lazy (lookup)
+import Data.Text (replace)
 import System.Environment (getArgs)
 import System.IO (hPutStrLn, stderr)
 import System.Posix.Files (getFdStatus, isNamedPipe)
@@ -70,7 +72,7 @@ putResult inputs rs = do
     putStrLn $ printf (indent "fail:     %4d") $ length fails
     unless (null fails) $ do
       hPutStrLn stderr "Fails"
-      mapM_ (hPutStrLn stderr . indent . snd) fails
+      forM_ fails $ \(line, err) -> hPutStrLn stderr $ indent line ++ "\n" ++ indent ('\t' : byText (replace "\n" " ") err)
 
 
 sourceLine :: LiNameSource -> String
