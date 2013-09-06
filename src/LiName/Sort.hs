@@ -17,7 +17,7 @@ import Data.Text (pack, toLower, Text)
 
 
 
--- FIXME Error should occurs for unknow type.
+-- FIXME IOError should occurs for unknow type.
 readSortType :: String -> LiNameSortType
 readSortType ('i':xs) = InvertedSort $ readSortType xs
 readSortType "m"      = SortByModTime
@@ -26,7 +26,7 @@ readSortType "p"      = SortByFilePath
 readSortType "N"      = SortByFileNameI
 readSortType "P"      = SortByFilePathI
 readSortType "-"      = DontSort
-readSortType _        = DontSort
+readSortType _        = error "Unknow sort type"
 
 
 sortPathList :: LiNameSortType -> [LiNamePath] -> IO [LiNamePath]
