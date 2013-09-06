@@ -3,6 +3,8 @@
 
 module LiName.Utils where
 
+import LiName.Types
+
 import Data.Text (replace, pack, unpack, Text)
 
 
@@ -19,3 +21,7 @@ byText f = unpack . f . pack
 
 unbreak :: String -> String
 unbreak = byText $ replace "\n" " "
+
+
+addDelim :: LiNamePath -> LiNamePath
+addDelim = (++ "/")

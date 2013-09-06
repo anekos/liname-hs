@@ -22,7 +22,7 @@ import Control.Lens
 import Control.Monad (forM_, unless)
 import Data.Either (lefts, rights)
 import Data.Either.Unwrap (mapLeft)
-import Data.List (isPrefixOf)
+import Data.List ((\\), isPrefixOf)
 import Data.Map (Map, fromList)
 import Data.Map.Lazy (lookup)
 import System.Environment (getArgs)
@@ -79,7 +79,7 @@ sourceLine (LiNameKey key, fp) = printf "%.4d\t%s" key fp
 
 editAndProcess :: LiNameConfig -> [String] -> Map LiNameKey LiNamePath -> String -> IO [LiNameResult]
 editAndProcess conf ss sm common = do
-    ls <- filter (not . isPrefixOf "#") <$> edit (conf^.editorCommand) ss
+    ls <- (\\ ss) . filter (not . isPrefixOf "#") <$> edit (conf^.editorCommand) ss
     results <- mapM (process conf sm common) ls
     clean $ map snd $ rights results
     putResult (length ss) results

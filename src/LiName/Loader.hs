@@ -23,7 +23,8 @@ loadPath :: FilePath -> IO [LiNamePath]
 loadPath fp = do
     fs <- getFileStatus fp
     case (isDirectory fs, isRegularFile fs) of
-         (True, _) -> loadDirectory fp `catchIOError` const (return [])
+         (True, _) -> do xs <- loadDirectory fp `catchIOError` const (return [])
+                         return $ if null xs then [addDelim fp] else xs
          (_, True) -> return [fp]
          _         -> return []
 
