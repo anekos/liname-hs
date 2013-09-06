@@ -14,7 +14,7 @@ t:
 d:
 	cabal install --enable-test --only-dependencies
 
-l: build
+l: clean build
 	hlint src
 
 ctags:
