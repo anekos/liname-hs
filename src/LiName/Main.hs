@@ -46,7 +46,8 @@ main' (Right (conf, pathArgs)) = do
 retry :: LiNameConfig -> Map LiNameKey LiNamePath -> String -> [LiNameFail] -> IO ()
 retry _ _ _ [] = return ()
 retry conf sm common fails = do
-    results <- editAndProcess conf (map fst fails) sm common
+    let ls = fails >>= \(x, y) -> ["# " ++ unbreak y, x]
+    results <- editAndProcess conf ls sm common
     retry conf sm common $ lefts results
 
 
