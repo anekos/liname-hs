@@ -9,13 +9,15 @@ endif
 
 syntax clear
 
-syntax match   linameComment            ".*"
-syntax match   linameCommand            "^[=!%]\+" skipwhite nextgroup=linameNumber
-syntax match   linameNumber             "\d\+\t" skipwhite nextgroup=linameFile,linameFolder
-syntax match   linameFile               ".*" contained
-syntax match   linameFolder             ".*\\$" contained
+syntax match   linameInvalid            ".*"
+syntax match   linameComment            "#.*"
+syntax match   linameLine               "^[!=%]*[0-9]\+\t.\+$" contains=linameCommand,linameKey,linamePath
+syntax match   linameCommand            "^[!=%]\+" nextgroup=linameKey
+syntax match   linameKey                "\d\+\t" nextgroup=linamePath
+syntax match   linamePath               ".*$" contained
 
 highlight link linameComment            Comment
-highlight link linameNumber             Number
-highlight link linameCommand            Keyword
+highlight link linameKey                Label
+highlight link linameCommand            Type
+highlight link linameInvalid            Error
 
