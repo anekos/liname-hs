@@ -30,12 +30,13 @@ import System.IO (hPutStrLn, stderr)
 import System.Posix.Files (getFdStatus, isNamedPipe)
 import System.Posix.IO (stdInput)
 import Text.Printf (printf)
+import Control.Monad.Reader (runReaderT)
 
 
 
 main' :: Either String (LiNameConfig, [String]) -> IO ()
 main' (Left err)               = hPutStrLn stderr err
-main' (Right (conf, pathArgs)) = do
+main' (Right (conf, pathArgs)) = flip runReaderT conf $ do
     (common, ps) <- compactPath' (conf^.compact) <$> (sortPathList (conf^.sortType) =<< loadPath' pathArgs)
     let ss = makeSources ps
         sm = fromList ss
@@ -43,7 +44,7 @@ main' (Right (conf, pathArgs)) = do
     retry conf sm common $ lefts results
 
 
-retry :: LiNameConfig -> Map LiNameKey LiNamePath -> String -> [LiNameFail] -> IO ()
+retry :: LiNameConfig -> Map LiNameKey LiNamePath -> String -> [LiNameFail] -> L ()
 retry _ _ _ [] = return ()
 retry conf sm common fails = do
     let ls = fails >>= \(x, y) -> ["# " ++ unbreak y, x]
@@ -77,16 +78,16 @@ sourceLine :: LiNameSource -> String
 sourceLine (LiNameKey key, fp) = printf "%.4d\t%s" key fp
 
 
-editAndProcess :: LiNameConfig -> [String] -> Map LiNameKey LiNamePath -> String -> IO [LiNameResult]
+editAndProcess :: LiNameConfig -> [String] -> Map LiNameKey LiNamePath -> String -> L [LiNameResult]
 editAndProcess conf ss sm common = do
-    ls <- (\\ ss) . filter (not . isPrefixOf "#") <$> edit (conf^.editorCommand) ss
+    ls <- io $ (\\ ss) . filter (not . isPrefixOf "#") <$> edit (conf^.editorCommand) ss
     results <- mapM (process conf sm common) ls
-    clean $ map snd $ rights results
-    putResult (length ss) results
+    io $ clean $ map snd $ rights results
+    io $  putResult (length ss) results
     return results
 
 
-process :: LiNameConfig -> Map LiNameKey LiNamePath -> LiNamePath -> String -> IO LiNameResult
+process :: LiNameConfig -> Map LiNameKey LiNamePath -> LiNamePath -> String -> L LiNameResult
 process conf sm common line =
     case readLine line of
       Left fail   -> return $ Left fail

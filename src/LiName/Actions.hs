@@ -18,11 +18,11 @@ import Control.Monad (when)
 
 
 
-doAction :: LiNameConfig -> LiNamePath -> LiNameAction -> LiNamePath -> IO (Either String ())
-doAction _ cp (DoRename t) f  = doRename (cp </> f) (cp </> t)
-doAction _ cp (DoCopy t) f    = doCopy (cp </> f) (cp </> t)
-doAction _ cp DoDelete f      = msgCatch f $ removeFile (cp </> f)
-doAction c cp DoTrash  f      = msgCatch f $ fromExitCode <$> run (c^.trashCommand) (cp </> f)
+doAction :: LiNameConfig -> LiNamePath -> LiNameAction -> LiNamePath -> L (Either String ())
+doAction _ cp (DoRename t) f  = io $ doRename (cp </> f) (cp </> t)
+doAction _ cp (DoCopy t) f    = io $ doCopy (cp </> f) (cp </> t)
+doAction _ cp DoDelete f      = io $ msgCatch f $ removeFile (cp </> f)
+doAction c cp DoTrash  f      = io $ msgCatch f $ fromExitCode <$> run (c^.trashCommand) (cp </> f)
 
 
 doRename :: LiNamePath -> LiNamePath -> IO (Either String ())
@@ -52,7 +52,7 @@ checkExistingFile fp a = do
 
 
 moveFile :: FilePath -> FilePath -> IO ()
-moveFile f t = renameFile f t `catchIOError` const (copyFile f t >> removeFile f)
+moveFile f t = renameFile f t -- FIXME `catchIOError` const (copyFile f t >> removeFile f)
 
 
 msgCatch :: LiNamePath -> IO a -> IO (Either String ())

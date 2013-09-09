@@ -1,9 +1,16 @@
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE ExistentialQuantification, FlexibleInstances, GeneralizedNewtypeDeriving,
+             MultiParamTypeClasses, TypeSynonymInstances, CPP, DeriveDataTypeable #-}
 
 module LiName.Types where
 
+import Control.Applicative
+import Data.Monoid
 import Control.Lens
 import Data.Default (def, Default)
+import Control.Monad.Reader
+import Control.Monad.State
+import Data.Typeable
 
 
 type LiNamePath = FilePath
@@ -61,6 +68,13 @@ type LiNameResult = Either LiNameFail LiNameSuccess
 editorCommandDefault, trashCommandDefault :: LiNameCommand
 editorCommandDefault = LiNameCommand "gvim" ["--nofork", "%"] "%"
 trashCommandDefault  = LiNameCommand "false" [] "%"
+
+
+type L a = ReaderT LiNameConfig IO a
+
+io :: MonadIO m => IO a -> m a
+io = liftIO
+
 
 
 makeLenses ''LiNameCommand
