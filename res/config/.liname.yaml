@@ -1,0 +1,15 @@
+editor:
+  command: 'gvim'
+  options:
+    - '--nofork'
+    - '%'
+  place_holder: '%'
+trash:
+  command: 'trash-put'
+  options:
+    - '%'
+  place_holder: '%'
+compact: 2
+sort: n
+ignore: 'LICENSE'
+ignore-path: '^\.git'
