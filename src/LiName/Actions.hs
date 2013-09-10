@@ -33,7 +33,7 @@ doRename f t
     | f == t    = return $ Right ()
     | otherwise = msgCatch t $ do
         isDir <- isDirectory <$> getFileStatus f
-        let mv = if isDir then moveFile else renameDirectory
+        let mv = if isDir then renameDirectory else moveFile
         checkExistingFile t $ createDirectoryIfMissing True (takeDirectory t) >> mv f t
 
 
