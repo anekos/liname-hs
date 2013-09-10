@@ -16,15 +16,14 @@ import System.Directory (getDirectoryContents)
 import System.FilePath (combine)
 import System.IO.Error (catchIOError)
 import System.Posix.Files (getFileStatus, isDirectory, isRegularFile)
-import Text.Regex
-import Data.Maybe (isJust)
 
 
 
 loadPath :: [FilePath] -> L [LiNamePath]
 loadPath fps = do
-    reMatcher <- maybe (const True) makeMatcher . _ignore <$> ask
-    filter reMatcher . map cleanPath . concat <$> mapM loadPath' fps
+    pathMatcher <- _ignorePath <$> ask
+    nameMatcher <- _ignore <$> ask
+    filter nameMatcher . filter pathMatcher . map cleanPath . concat <$> mapM loadPath' fps
 
 
 loadPath' :: FilePath -> L [LiNamePath]
@@ -35,11 +34,6 @@ loadPath' fp = do
                          return $ if null xs then [addDelim fp] else xs
          (_, True) -> return [fp]
          _         -> return []
-
-
-makeMatcher :: String -> String -> Bool
-makeMatcher s = let re = mkRegex s
-                in  not . isJust . matchRegex re
 
 
 ls :: FilePath -> L [FilePath]

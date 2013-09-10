@@ -45,7 +45,8 @@ data LiNameConfig = LiNameConfig
                   , _trashCommand :: LiNameCommand
                   , _compact :: Maybe Int
                   , _sortType :: LiNameSortType
-                  , _ignore :: Maybe String } deriving Show
+                  , _ignore :: String -> Bool
+                  , _ignorePath :: String -> Bool }
 
 
 instance Default LiNameConfig where
@@ -53,7 +54,8 @@ instance Default LiNameConfig where
                        , _trashCommand = trashCommandDefault
                        , _compact = Nothing
                        , _sortType = DontSort
-                       , _ignore = Nothing }
+                       , _ignore = const True
+                       , _ignorePath = const True }
 
 
 type LiNameSuccess = (LiNameEntry, LiNamePath)
