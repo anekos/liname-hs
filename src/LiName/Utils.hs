@@ -5,7 +5,9 @@ module LiName.Utils where
 
 import LiName.Types
 
+import Data.Maybe (isNothing)
 import Data.Text (replace, pack, unpack, Text)
+import Text.Regex (mkRegex, matchRegex)
 
 
 
@@ -25,3 +27,8 @@ unbreak = byText $ replace "\n" " "
 
 addDelim :: LiNamePath -> LiNamePath
 addDelim = (++ "/")
+
+
+makeNotMatcher :: String -> String -> Bool
+makeNotMatcher s = let re = mkRegex s
+                   in  isNothing . matchRegex re

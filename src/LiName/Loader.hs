@@ -3,7 +3,6 @@
 
 module LiName.Loader (
   loadPath,
-  loadPath',
   makeSources
 ) where
 
@@ -11,6 +10,7 @@ import LiName.Types
 import LiName.Utils
 
 import Control.Applicative ((<$>))
+import Control.Monad.Reader (ask)
 import Data.Text (pack, stripPrefix, unpack)
 import System.Directory (getDirectoryContents)
 import System.FilePath (combine)
@@ -19,30 +19,35 @@ import System.Posix.Files (getFileStatus, isDirectory, isRegularFile)
 
 
 
-loadPath :: FilePath -> IO [LiNamePath]
-loadPath fp = do
-    fs <- getFileStatus fp
+loadPath :: [FilePath] -> L [LiNamePath]
+loadPath fps = do
+    pathMatcher <- _ignorePath <$> ask
+    nameMatcher <- _ignore <$> ask
+    filter nameMatcher . filter pathMatcher . map cleanPath . concat <$> mapM loadPath' fps
+
+
+loadPath' :: FilePath -> L [LiNamePath]
+loadPath' fp = do
+    fs <- io $ getFileStatus fp
     case (isDirectory fs, isRegularFile fs) of
-         (True, _) -> do xs <- loadDirectory fp `catchIOError` const (return [])
+         (True, _) -> do xs <- loadDirectory fp
                          return $ if null xs then [addDelim fp] else xs
          (_, True) -> return [fp]
          _         -> return []
 
 
-loadPath' :: [FilePath] -> IO [LiNamePath]
-loadPath' fps = concat <$> mapM loadPath fps
+ls :: FilePath -> L [FilePath]
+ls dir = map (combine dir) <$> filter notDots <$> getDir
+  where
+    getDir = io $ getDirectoryContents dir `catchIOError` const (return [])
 
 
-ls :: FilePath -> IO [FilePath]
-ls dir = map (combine dir) <$> filter notDots <$> getDirectoryContents dir
-
-
-loadDirectory :: FilePath -> IO [LiNamePath]
-loadDirectory dir = concat <$> (ls dir >>= mapM loadPath)
+loadDirectory :: FilePath -> L [LiNamePath]
+loadDirectory dir = concat <$> (ls dir >>= mapM loadPath')
 
 
 makeSources:: [FilePath] -> [LiNameSource]
-makeSources = zip (map LiNameKey [1..]) . map cleanPath
+makeSources = zip (map LiNameKey [1..])
 
 
 cleanPath :: LiNamePath -> LiNamePath
