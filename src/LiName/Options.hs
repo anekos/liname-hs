@@ -24,6 +24,9 @@ options =
                 , "           N = file name (case insesitve)"
                 , "           P = file path (case insesitve)"
                 , "           iX = inverted X" ])
+   , Option "i" ["ignore"]
+       (ReqArg (\value opts -> opts { _ignore = Just value }) "REGEXP")
+       "Ignore pattern"
    , Option "c" ["compact"]
        (ReqArg (\value opts -> opts { _compact = Just $ read value }) "LEVEL")
        "Compact directory part" ]

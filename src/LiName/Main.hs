@@ -37,7 +37,7 @@ import Control.Monad.Reader (runReaderT)
 main' :: Either String (LiNameConfig, [String]) -> IO ()
 main' (Left err)               = hPutStrLn stderr err
 main' (Right (conf, pathArgs)) = flip runReaderT conf $ do
-    (common, ps) <- compactPath' (conf^.compact) <$> (sortPathList =<< io (loadPath' pathArgs))
+    (common, ps) <- compactPath' (conf^.compact) <$> (sortPathList =<< loadPath pathArgs)
     let ss = makeSources ps
         sm = fromList ss
     results <- editAndProcess (map sourceLine ss) sm common

@@ -44,14 +44,16 @@ data LiNameConfig = LiNameConfig
                   { _editorCommand :: LiNameCommand
                   , _trashCommand :: LiNameCommand
                   , _compact :: Maybe Int
-                  , _sortType :: LiNameSortType } deriving Show
+                  , _sortType :: LiNameSortType
+                  , _ignore :: Maybe String } deriving Show
 
 
 instance Default LiNameConfig where
     def = LiNameConfig { _editorCommand = editorCommandDefault
                        , _trashCommand = trashCommandDefault
                        , _compact = Nothing
-                       , _sortType = DontSort }
+                       , _sortType = DontSort
+                       , _ignore = Nothing }
 
 
 type LiNameSuccess = (LiNameEntry, LiNamePath)
