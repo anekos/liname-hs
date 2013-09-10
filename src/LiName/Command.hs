@@ -8,6 +8,7 @@ import LiName.Types
 
 import Control.Applicative ((<$>))
 import Control.Lens
+import Control.Monad.Reader (ask)
 import System.Directory (getTemporaryDirectory, removeFile)
 import System.Exit (ExitCode(..))
 import System.IO (hClose, hPutStr, openTempFile)
@@ -21,13 +22,15 @@ run cmd arg = do
     runProcess (cmd^.path) as Nothing Nothing Nothing Nothing Nothing >>= waitForProcess
 
 
-edit :: LiNameCommand -> [String] -> IO [String]
-edit cmd contents = do
-    fn <- makeTempFile contents
-    run cmd fn
-    ls <- lines <$> readFile fn
-    removeFile fn
-    return ls
+edit :: [String] -> L [String]
+edit contents = do
+    cmd <- _editorCommand <$> ask
+    io $ do
+      fn <- makeTempFile contents
+      run cmd fn
+      ls <- lines <$> readFile fn
+      removeFile fn
+      return ls
 
 
 makeTempFile :: [String] -> IO String

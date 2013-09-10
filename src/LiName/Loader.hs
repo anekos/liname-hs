@@ -14,8 +14,8 @@ import Control.Applicative ((<$>))
 import Data.Text (pack, stripPrefix, unpack)
 import System.Directory (getDirectoryContents)
 import System.FilePath (combine)
-import System.Posix.Files (getFileStatus, isDirectory, isRegularFile)
 import System.IO.Error (catchIOError)
+import System.Posix.Files (getFileStatus, isDirectory, isRegularFile)
 
 
 

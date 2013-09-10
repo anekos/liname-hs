@@ -8,21 +8,23 @@ import LiName.Types
 import LiName.Command
 
 import Control.Applicative ((<$>))
-import Control.Lens
-import System.Directory (copyFile, createDirectoryIfMissing, doesDirectoryExist, doesFileExist, removeFile, renameFile)
-import System.Exit (ExitCode(ExitSuccess, ExitFailure))
-import System.IO.Error (catchIOError)
-import System.FilePath.Posix ((</>), takeDirectory)
 import Control.Exception (throwIO)
 import Control.Monad (when)
+import Control.Monad.Reader (ask)
+import System.Directory (copyFile, createDirectoryIfMissing, doesDirectoryExist, doesFileExist, removeFile, renameFile)
+import System.Exit (ExitCode(ExitSuccess, ExitFailure))
+import System.FilePath.Posix ((</>), takeDirectory)
+import System.IO.Error (catchIOError)
 
 
 
-doAction :: LiNameConfig -> LiNamePath -> LiNameAction -> LiNamePath -> IO (Either String ())
-doAction _ cp (DoRename t) f  = doRename (cp </> f) (cp </> t)
-doAction _ cp (DoCopy t) f    = doCopy (cp </> f) (cp </> t)
-doAction _ cp DoDelete f      = msgCatch f $ removeFile (cp </> f)
-doAction c cp DoTrash  f      = msgCatch f $ fromExitCode <$> run (c^.trashCommand) (cp </> f)
+doAction :: LiNamePath -> LiNameAction -> LiNamePath -> L (Either String ())
+doAction cp (DoRename t) f  = io $ doRename (cp </> f) (cp </> t)
+doAction cp (DoCopy t) f    = io $ doCopy (cp </> f) (cp </> t)
+doAction cp DoDelete f      = io $ msgCatch f $ removeFile (cp </> f)
+doAction cp DoTrash  f      = do
+    cmd <- _trashCommand <$> ask
+    io $ msgCatch f $ fromExitCode <$> run cmd (cp </> f)
 
 
 doRename :: LiNamePath -> LiNamePath -> IO (Either String ())
