@@ -11,10 +11,11 @@ import Control.Applicative ((<$>))
 import Control.Exception (throwIO)
 import Control.Monad (when)
 import Control.Monad.Reader (ask)
-import System.Directory (copyFile, createDirectoryIfMissing, doesDirectoryExist, doesFileExist, removeFile, renameFile)
+import System.Directory (copyFile, createDirectoryIfMissing, doesDirectoryExist, doesFileExist, removeFile, renameDirectory, renameFile)
 import System.Exit (ExitCode(ExitSuccess, ExitFailure))
 import System.FilePath.Posix ((</>), takeDirectory)
 import System.IO.Error (catchIOError)
+import System.Posix.Files (getFileStatus, isDirectory)
 
 
 
@@ -30,7 +31,10 @@ doAction cp DoTrash  f      = do
 doRename :: LiNamePath -> LiNamePath -> IO (Either String ())
 doRename f t
     | f == t    = return $ Right ()
-    | otherwise = msgCatch t $ checkExistingFile t $ createDirectoryIfMissing True (takeDirectory t) >> moveFile f t
+    | otherwise = msgCatch t $ do
+        isDir <- isDirectory <$> getFileStatus f
+        let mv = if isDir then moveFile else renameDirectory
+        checkExistingFile t $ createDirectoryIfMissing True (takeDirectory t) >> mv f t
 
 
 doCopy :: LiNamePath -> LiNamePath -> IO (Either String ())
