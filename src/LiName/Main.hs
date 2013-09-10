@@ -37,19 +37,19 @@ import Control.Monad.Reader (runReaderT)
 main' :: Either String (LiNameConfig, [String]) -> IO ()
 main' (Left err)               = hPutStrLn stderr err
 main' (Right (conf, pathArgs)) = flip runReaderT conf $ do
-    (common, ps) <- compactPath' (conf^.compact) <$> (sortPathList (conf^.sortType) =<< loadPath' pathArgs)
+    (common, ps) <- compactPath' (conf^.compact) <$> (sortPathList =<< io (loadPath' pathArgs))
     let ss = makeSources ps
         sm = fromList ss
-    results <- editAndProcess conf (map sourceLine ss) sm common
-    retry conf sm common $ lefts results
+    results <- editAndProcess (map sourceLine ss) sm common
+    retry sm common $ lefts results
 
 
-retry :: LiNameConfig -> Map LiNameKey LiNamePath -> String -> [LiNameFail] -> L ()
-retry _ _ _ [] = return ()
-retry conf sm common fails = do
+retry :: Map LiNameKey LiNamePath -> String -> [LiNameFail] -> L ()
+retry _ _ []          = return ()
+retry sm common fails = do
     let ls = fails >>= \(x, y) -> ["# " ++ unbreak y, x]
-    results <- editAndProcess conf ls sm common
-    retry conf sm common $ lefts results
+    results <- editAndProcess ls sm common
+    retry sm common $ lefts results
 
 
 getConf :: IO (Either String (LiNameConfig, [String]))
@@ -78,24 +78,24 @@ sourceLine :: LiNameSource -> String
 sourceLine (LiNameKey key, fp) = printf "%.4d\t%s" key fp
 
 
-editAndProcess :: LiNameConfig -> [String] -> Map LiNameKey LiNamePath -> String -> L [LiNameResult]
-editAndProcess conf ss sm common = do
-    ls <- io $ (\\ ss) . filter (not . isPrefixOf "#") <$> edit (conf^.editorCommand) ss
-    results <- mapM (process conf sm common) ls
+editAndProcess :: [String] -> Map LiNameKey LiNamePath -> String -> L [LiNameResult]
+editAndProcess ss sm common = do
+    ls <- (\\ ss) . filter (not . isPrefixOf "#") <$> edit ss
+    results <- mapM (process sm common) ls
     io $ clean $ map snd $ rights results
     io $  putResult (length ss) results
     return results
 
 
-process :: LiNameConfig -> Map LiNameKey LiNamePath -> LiNamePath -> String -> L LiNameResult
-process conf sm common line =
+process :: Map LiNameKey LiNamePath -> LiNamePath -> String -> L LiNameResult
+process sm common line =
     case readLine line of
       Left fail   -> return $ Left fail
       Right entry ->
           case findPath sm entry of
             Nothing    -> return $ Left (line, "Not found key: " ++ show (entry^.entryKey))
             Just fp  -> do
-                r <- doAction conf common (entry^.action) fp
+                r <- doAction common (entry^.action) fp
                 case r of
                   Right ()  -> return $ Right (entry, fp)
                   Left err' -> return $ Left (line, err')

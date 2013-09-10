@@ -14,30 +14,30 @@ import Control.Applicative ((<$>))
 import Data.Text (pack, stripPrefix, unpack)
 import System.Directory (getDirectoryContents)
 import System.FilePath (combine)
-import System.Posix.Files (getFileStatus, isDirectory, isRegularFile)
 import System.IO.Error (catchIOError)
+import System.Posix.Files (getFileStatus, isDirectory, isRegularFile)
 
 
 
-loadPath :: FilePath -> L [LiNamePath]
+loadPath :: FilePath -> IO [LiNamePath]
 loadPath fp = do
-    fs <- io $ getFileStatus fp
+    fs <- getFileStatus fp
     case (isDirectory fs, isRegularFile fs) of
-         (True, _) -> do xs <- loadDirectory fp -- FIXME `catchIO` const (return [])
+         (True, _) -> do xs <- loadDirectory fp `catchIOError` const (return [])
                          return $ if null xs then [addDelim fp] else xs
          (_, True) -> return [fp]
          _         -> return []
 
 
-loadPath' :: [FilePath] -> L [LiNamePath]
+loadPath' :: [FilePath] -> IO [LiNamePath]
 loadPath' fps = concat <$> mapM loadPath fps
 
 
-ls :: FilePath -> L [FilePath]
-ls dir = map (combine dir) <$> filter notDots <$> (io $ getDirectoryContents dir)
+ls :: FilePath -> IO [FilePath]
+ls dir = map (combine dir) <$> filter notDots <$> getDirectoryContents dir
 
 
-loadDirectory :: FilePath -> L [LiNamePath]
+loadDirectory :: FilePath -> IO [LiNamePath]
 loadDirectory dir = concat <$> (ls dir >>= mapM loadPath)
 
 

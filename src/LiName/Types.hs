@@ -4,13 +4,9 @@
 
 module LiName.Types where
 
-import Control.Applicative
-import Data.Monoid
 import Control.Lens
-import Data.Default (def, Default)
 import Control.Monad.Reader
-import Control.Monad.State
-import Data.Typeable
+import Data.Default (def, Default)
 
 
 type LiNamePath = FilePath
