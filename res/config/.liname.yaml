@@ -10,6 +10,6 @@ trash:
     - '%'
   place_holder: '%'
 compact: 2
-sort: n
+sort: 'n'
 ignore: 'LICENSE'
 ignore-path: '^\.git'
