@@ -14,6 +14,7 @@ import Control.Monad.Reader (ask)
 import Data.Text (pack, stripPrefix, unpack)
 import System.Directory (getDirectoryContents)
 import System.FilePath (combine)
+import System.IO (hPrint, stderr)
 import System.IO.Error (catchIOError)
 import System.Posix.Files (getFileStatus, isDirectory, isRegularFile)
 
@@ -29,7 +30,7 @@ loadPath fps = do
 loadPath' :: FilePath -> L [LiNamePath]
 loadPath' fp = do
     -- getFileStatus fails, if the path does not exist.
-    mfs <- io $ fmap Just (getFileStatus fp) `catchIOError` const (return Nothing)
+    mfs <- io $ getFileStatus' `catchIOError` putError
     case mfs of
       Nothing -> return []
       Just fs ->
@@ -38,6 +39,9 @@ loadPath' fp = do
                              return $ if null xs then [addDelim fp] else xs
              (_, True) -> return [fp]
              _         -> return []
+  where
+    getFileStatus' = fmap Just (getFileStatus fp)
+    putError e = hPrint stderr e >> return Nothing
 
 
 ls :: FilePath -> L [FilePath]
