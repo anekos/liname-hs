@@ -28,12 +28,16 @@ loadPath fps = do
 
 loadPath' :: FilePath -> L [LiNamePath]
 loadPath' fp = do
-    fs <- io $ getFileStatus fp
-    case (isDirectory fs, isRegularFile fs) of
-         (True, _) -> do xs <- loadDirectory fp
-                         return $ if null xs then [addDelim fp] else xs
-         (_, True) -> return [fp]
-         _         -> return []
+    -- getFileStatus fails, if the path does not exist.
+    mfs <- io $ fmap Just (getFileStatus fp) `catchIOError` const (return Nothing)
+    case mfs of
+      Nothing -> return []
+      Just fs ->
+        case (isDirectory fs, isRegularFile fs) of
+             (True, _) -> do xs <- loadDirectory fp
+                             return $ if null xs then [addDelim fp] else xs
+             (_, True) -> return [fp]
+             _         -> return []
 
 
 ls :: FilePath -> L [FilePath]
