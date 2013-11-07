@@ -34,7 +34,10 @@ options =
        "Ignore pattern for path"
    , Option "c" ["compact"]
        (ReqArg (\value opts -> opts { _compact = Just $ read value }) "LEVEL")
-       "Compact directory part" ]
+       "Compact directory part"
+   , Option "R" ["no-recursive"]
+       (NoArg (\opts -> opts { _recursive = False }))
+        "No recursive path adding" ]
 
 
 parseOptions :: LiNameConfig -> [String] -> IO (Either String (LiNameConfig, [String]))

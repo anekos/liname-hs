@@ -46,7 +46,8 @@ data LiNameConfig = LiNameConfig
                   , _compact :: Maybe Int
                   , _sortType :: LiNameSortType
                   , _ignore :: String -> Bool
-                  , _ignorePath :: String -> Bool }
+                  , _ignorePath :: String -> Bool
+                  , _recursive :: Bool }
 
 
 instance Default LiNameConfig where
@@ -55,7 +56,8 @@ instance Default LiNameConfig where
                        , _compact = Nothing
                        , _sortType = DontSort
                        , _ignore = const True
-                       , _ignorePath = const True }
+                       , _ignorePath = const True
+                       , _recursive = True }
 
 
 type LiNameSuccess = (LiNameEntry, LiNamePath)

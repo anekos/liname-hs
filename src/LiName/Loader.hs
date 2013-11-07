@@ -29,16 +29,18 @@ loadPath fps = do
 
 loadPath' :: FilePath -> L [LiNamePath]
 loadPath' fp = do
+    rec <- _recursive <$> ask
     -- getFileStatus fails, if the path does not exist.
     mfs <- io $ getFileStatus' `catchIOError` putError
     case mfs of
       Nothing -> return []
       Just fs ->
-        case (isDirectory fs, isRegularFile fs) of
-             (True, _) -> do xs <- loadDirectory fp
-                             return $ if null xs then [addDelim fp] else xs
-             (_, True) -> return [fp]
-             _         -> return []
+        case (rec, isDirectory fs, isRegularFile fs) of
+             (False, _, _) -> return [fp]
+             (_, True, _)  -> do xs <- loadDirectory fp
+                                 return $ if null xs then [addDelim fp] else xs
+             (_, _, True)  -> return [fp]
+             _             -> return []
   where
     getFileStatus' = fmap Just (getFileStatus fp)
     putError e = hPrint stderr e >> return Nothing
