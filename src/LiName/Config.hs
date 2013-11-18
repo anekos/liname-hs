@@ -8,7 +8,6 @@ module LiName.Config (
 
 import LiName.Sort
 import LiName.Types
-import LiName.Utils
 
 import Prelude hiding (lookup)
 import Control.Exception
@@ -32,8 +31,8 @@ loadConfigFile = do
                  , _trashCommand = tc
                  , _compact = lookup y (pack "compact")
                  , _sortType = maybe DontSort readSortType $ lookup y (pack "sort")
-                 , _ignore = maybe (def^.ignore) makeNotMatcher $ lookup y (pack "ignore")
-                 , _ignorePath = maybe (def^.ignorePath) makeNotMatcher $ lookup y (pack "ignore-path") }
+                 , _ignoreName = maybe (def^.ignoreName) Just $ lookup y (pack "ignore-name")
+                 , _ignorePath = maybe (def^.ignorePath) Just $ lookup y (pack "ignore-path") }
   `catch`
     catchAndReturnDefault def
 

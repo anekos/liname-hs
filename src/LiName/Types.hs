@@ -1,10 +1,11 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TemplateHaskell, DeriveDataTypeable #-}
 
 module LiName.Types where
 
 import Control.Lens
 import Control.Monad.Reader
 import Data.Default (def, Default)
+import Data.Typeable
 
 
 type LiNamePath = FilePath
@@ -28,7 +29,7 @@ data LiNameEntry = LiNameEntry { _entryKey :: LiNameKey, _action :: LiNameAction
 data LiNameCommand = LiNameCommand
                    { _path         :: FilePath
                    , _args         :: [String]
-                   , _placeHolder  :: String } deriving Show
+                   , _placeHolder  :: String } deriving (Show, Read, Eq, Typeable)
 
 
 data LiNameSortType = SortByFileName
@@ -37,7 +38,7 @@ data LiNameSortType = SortByFileName
                     | SortByFilePathI
                     | SortByModTime
                     | DontSort
-                    | InvertedSort LiNameSortType deriving Show
+                    | InvertedSort LiNameSortType deriving (Show, Read, Eq, Typeable)
 
 
 data LiNameConfig = LiNameConfig
@@ -45,9 +46,9 @@ data LiNameConfig = LiNameConfig
                   , _trashCommand :: LiNameCommand
                   , _compact :: Maybe Int
                   , _sortType :: LiNameSortType
-                  , _ignore :: String -> Bool
-                  , _ignorePath :: String -> Bool
-                  , _recursive :: Bool }
+                  , _ignoreName :: Maybe String
+                  , _ignorePath :: Maybe String
+                  , _recursive :: Bool } deriving (Show, Read, Eq, Typeable)
 
 
 instance Default LiNameConfig where
@@ -55,8 +56,8 @@ instance Default LiNameConfig where
                        , _trashCommand = trashCommandDefault
                        , _compact = Nothing
                        , _sortType = DontSort
-                       , _ignore = const True
-                       , _ignorePath = const True
+                       , _ignoreName = Nothing
+                       , _ignorePath = Nothing
                        , _recursive = True }
 
 

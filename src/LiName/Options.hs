@@ -5,10 +5,8 @@ module LiName.Options (
 
 import LiName.Sort
 import LiName.Types
-import LiName.Utils
 
 import System.Console.GetOpt
-import System.FilePath.Posix (takeFileName)
 
 
 
@@ -27,10 +25,10 @@ options =
                 , "           P = file path (case insesitve)"
                 , "           iX = inverted X" ])
    , Option "i" ["ignore"]
-       (ReqArg (\value opts -> opts { _ignore = makeNotMatcher value . takeFileName }) "REGEXP")
+       (ReqArg (\value opts -> opts { _ignoreName = Just value }) "REGEXP")
        "Ignore pattern for file name"
    , Option "I" ["ignore-path"]
-       (ReqArg (\value opts -> opts { _ignorePath = makeNotMatcher value }) "REGEXP")
+       (ReqArg (\value opts -> opts { _ignorePath = Just value }) "REGEXP")
        "Ignore pattern for path"
    , Option "c" ["compact"]
        (ReqArg (\value opts -> opts { _compact = Just $ read value }) "LEVEL")
