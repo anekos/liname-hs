@@ -9,7 +9,10 @@ trash:
   options:
     - '%'
   place_holder: '%'
-compact: 2
-sort: 'n'
-ignore: 'LICENSE'
-ignore-path: '^\.git'
+options:
+  - -c
+  - 2
+  - -i
+  - LICENSE
+  - -I
+  - ^\.git

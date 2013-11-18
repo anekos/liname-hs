@@ -58,7 +58,7 @@ getConf = do
     as <- getArgs
     fd <- getFdStatus stdInput
     pas <- if isNamedPipe fd then lines <$> getContents else return []
-    parseOptions fileConf $ as ++ pas
+    parseOptions False fileConf $ as ++ pas
 
 
 putResult :: Int -> [LiNameResult] -> IO ()

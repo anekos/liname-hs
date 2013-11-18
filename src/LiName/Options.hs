@@ -5,10 +5,8 @@ module LiName.Options (
 
 import LiName.Sort
 import LiName.Types
-import LiName.Utils
 
 import System.Console.GetOpt
-import System.FilePath.Posix (takeFileName)
 
 
 
@@ -27,10 +25,10 @@ options =
                 , "           P = file path (case insesitve)"
                 , "           iX = inverted X" ])
    , Option "i" ["ignore"]
-       (ReqArg (\value opts -> opts { _ignore = makeNotMatcher value . takeFileName }) "REGEXP")
+       (ReqArg (\value opts -> opts { _ignoreName = Just value }) "REGEXP")
        "Ignore pattern for file name"
    , Option "I" ["ignore-path"]
-       (ReqArg (\value opts -> opts { _ignorePath = makeNotMatcher value }) "REGEXP")
+       (ReqArg (\value opts -> opts { _ignorePath = Just value }) "REGEXP")
        "Ignore pattern for path"
    , Option "c" ["compact"]
        (ReqArg (\value opts -> opts { _compact = Just $ read value }) "LEVEL")
@@ -43,14 +41,14 @@ options =
         "No recursive path adding" ]
 
 
-parseOptions :: LiNameConfig -> [String] -> IO (Either String (LiNameConfig, [String]))
-parseOptions conf argv = parseOptions' conf $ getOpt Permute options argv
+parseOptions :: Bool -> LiNameConfig -> [String] -> IO (Either String (LiNameConfig, [String]))
+parseOptions allowEmpty conf argv = parseOptions' allowEmpty conf $ getOpt Permute options argv
 
 
-parseOptions' :: LiNameConfig -> ([LiNameConfig -> LiNameConfig], [String], [String]) -> IO (Either String (LiNameConfig, [String]))
-parseOptions' _ (_, [], es) = return $ Left $ usage es
-parseOptions' c (o, n, [])  = return $ Right (foldl (flip id) c o, n)
-parseOptions' _ (_, _, es)  = return $ Left $ usage es
+parseOptions' :: Bool -> LiNameConfig -> ([LiNameConfig -> LiNameConfig], [String], [String]) -> IO (Either String (LiNameConfig, [String]))
+parseOptions' False _ (_, [], es) = return $ Left $ usage es
+parseOptions' _     c (o, n, [])  = return $ Right (foldl (flip id) c o, n)
+parseOptions' _     _ (_, _, es)  = return $ Left $ usage es
 
 
 usage :: [String] -> String
