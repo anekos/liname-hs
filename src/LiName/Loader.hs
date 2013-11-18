@@ -14,7 +14,7 @@ import Control.Monad.Reader (ask)
 import Data.Text (pack, stripPrefix, unpack)
 import System.Directory (getDirectoryContents)
 import System.FilePath (combine)
-import System.FilePath.Posix (takeBaseName)
+import System.FilePath.Posix (takeFileName)
 import System.IO (hPrint, stderr)
 import System.IO.Error (catchIOError)
 import System.Posix.Files (getFileStatus, isDirectory, isRegularFile)
@@ -24,7 +24,7 @@ import System.Posix.Files (getFileStatus, isDirectory, isRegularFile)
 loadPath :: [FilePath] -> L [LiNamePath]
 loadPath fps = do
     matchPath <- (matcher id . _ignorePath) <$> ask
-    matchName <- (matcher takeBaseName . _ignoreName) <$> ask
+    matchName <- (matcher takeFileName . _ignoreName) <$> ask
     filter matchName . filter matchPath . map cleanPath . concat <$> mapM loadPath' fps
   where
     matcher _ Nothing  = const True
