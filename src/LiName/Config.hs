@@ -6,7 +6,7 @@ module LiName.Config (
 ) where
 
 
-import LiName.Sort
+import LiName.Options
 import LiName.Types
 
 import Prelude hiding (lookup)
@@ -27,12 +27,12 @@ loadConfigFile = do
     y <- load $ combine home ".liname.yaml"
     ec <- makeCommand' y "editor" editorCommandDefault
     tc <- makeCommand' y "trash" trashCommandDefault
-    return $ def { _editorCommand = ec
-                 , _trashCommand = tc
-                 , _compact = lookup y (pack "compact")
-                 , _sortType = maybe DontSort readSortType $ lookup y (pack "sort")
-                 , _ignoreName = maybe (def^.ignoreName) Just $ lookup y (pack "ignore-name")
-                 , _ignorePath = maybe (def^.ignorePath) Just $ lookup y (pack "ignore-path") }
+    let cmded = def { _editorCommand = ec , _trashCommand = tc }
+        opts = lookupDefault y (pack "options") []
+    parsed <- parseOptions True cmded opts
+    case parsed of
+      (Right (conf, _)) -> return conf
+      (Left e)          -> putStrLn e >> return cmded
   `catch`
     catchAndReturnDefault def
 

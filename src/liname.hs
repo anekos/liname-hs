@@ -6,4 +6,5 @@ import LiName.Main
 
 
 main :: IO ()
-main = getConf >>= main'
+main = do getConf >>= print
+          getConf >>= main'

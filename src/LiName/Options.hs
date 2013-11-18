@@ -41,14 +41,14 @@ options =
         "No recursive path adding" ]
 
 
-parseOptions :: LiNameConfig -> [String] -> IO (Either String (LiNameConfig, [String]))
-parseOptions conf argv = parseOptions' conf $ getOpt Permute options argv
+parseOptions :: Bool -> LiNameConfig -> [String] -> IO (Either String (LiNameConfig, [String]))
+parseOptions allowEmpty conf argv = parseOptions' allowEmpty conf $ getOpt Permute options argv
 
 
-parseOptions' :: LiNameConfig -> ([LiNameConfig -> LiNameConfig], [String], [String]) -> IO (Either String (LiNameConfig, [String]))
-parseOptions' _ (_, [], es) = return $ Left $ usage es
-parseOptions' c (o, n, [])  = return $ Right (foldl (flip id) c o, n)
-parseOptions' _ (_, _, es)  = return $ Left $ usage es
+parseOptions' :: Bool -> LiNameConfig -> ([LiNameConfig -> LiNameConfig], [String], [String]) -> IO (Either String (LiNameConfig, [String]))
+parseOptions' False _ (_, [], es) = return $ Left $ usage es
+parseOptions' _     c (o, n, [])  = return $ Right (foldl (flip id) c o, n)
+parseOptions' _     _ (_, _, es)  = return $ Left $ usage es
 
 
 usage :: [String] -> String
