@@ -4,6 +4,7 @@ module LiName.Command (
   run
 ) where
 
+import LiName.Filter
 import LiName.Types
 
 import Control.Applicative ((<$>))
@@ -25,8 +26,10 @@ run cmd arg = do
 edit :: [String] -> L [String]
 edit contents = do
     cmd <- _editorCommand <$> ask
+    fs <- _filters <$> ask
     io $ do
-      fn <- makeTempFile contents
+      contents' <- lines <$> filterCommands fs (unlines contents)
+      fn <- makeTempFile contents'
       run cmd fn
       ls <- lines <$> readFile fn
       removeFile fn

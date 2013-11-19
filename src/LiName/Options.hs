@@ -6,6 +6,7 @@ module LiName.Options (
 import LiName.Sort
 import LiName.Types
 
+import Control.Lens
 import System.Console.GetOpt
 
 
@@ -35,6 +36,9 @@ options =
        "Compact directory part"
    , Option "r" ["recursive"]
        (NoArg (\opts -> opts { _recursive = True }))
+        "recursive path adding"
+   , Option "f" ["filter"]
+       (ReqArg (\value opts -> opts & filters %~ (++ return (LiNameFilterCommand value))) "FILTER_COMMAND")
         "recursive path adding"
    , Option "R" ["no-recursive"]
        (NoArg (\opts -> opts { _recursive = False }))
