@@ -6,6 +6,7 @@ module LiName.Options (
 import LiName.Sort
 import LiName.Types
 
+import Control.Lens
 import System.Console.GetOpt
 
 
@@ -36,6 +37,12 @@ options =
    , Option "r" ["recursive"]
        (NoArg (\opts -> opts { _recursive = True }))
         "recursive path adding"
+   , Option "f" ["filter"]
+       (ReqArg (\value opts -> opts & pathFilters %~ (++ return (LiNameFilter value))) "FILTER_COMMAND")
+        "Filter command for path"
+   , Option "F" ["line-filter"]
+       (ReqArg (\value opts -> opts & lineFilters %~ (++ return (LiNameFilter value))) "FILTER_COMMAND")
+        "Filter command for line"
    , Option "R" ["no-recursive"]
        (NoArg (\opts -> opts { _recursive = False }))
         "No recursive path adding" ]

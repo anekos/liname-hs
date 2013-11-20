@@ -8,6 +8,7 @@ import LiName.Actions
 import LiName.Clean
 import LiName.Command
 import LiName.Config
+import LiName.Filter
 import LiName.Loader
 import LiName.Options
 import LiName.Parsers
@@ -20,6 +21,7 @@ import Prelude hiding (lookup, fail)
 import Control.Applicative ((<$>))
 import Control.Lens
 import Control.Monad (forM_, unless)
+import Control.Monad.Reader (ask)
 import Data.Either (lefts, rights)
 import Data.Either.Unwrap (mapLeft)
 import Data.List ((\\), isPrefixOf)
@@ -37,10 +39,13 @@ import Control.Monad.Reader (runReaderT)
 main' :: Either String (LiNameConfig, [String]) -> IO ()
 main' (Left err)               = hPutStrLn stderr err
 main' (Right (conf, pathArgs)) = flip runReaderT conf $ do
-    (common, ps) <- compactPath' (conf^.compact) <$> (sortPathList =<< loadPath pathArgs)
+    pfs <- _pathFilters <$> ask
+    lfs <- _lineFilters <$> ask
+    (common, ps) <- compactPath' (conf^.compact) <$> (loadPath pathArgs >>= sortPathList >>= io . filterCommands pfs)
     let ss = makeSources ps
         sm = fromList ss
-    results <- editAndProcess (map sourceLine ss) sm common
+    ss' <- io $ filterCommands lfs $ map sourceLine ss
+    results <- editAndProcess ss' sm common
     retry sm common $ lefts results
 
 

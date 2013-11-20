@@ -32,6 +32,9 @@ data LiNameCommand = LiNameCommand
                    , _placeHolder  :: String } deriving (Show, Read, Eq, Typeable)
 
 
+data LiNameFilter = LiNameFilter String deriving (Show, Read, Eq, Typeable)
+
+
 data LiNameSortType = SortByFileName
                     | SortByFilePath
                     | SortByFileNameI
@@ -48,6 +51,8 @@ data LiNameConfig = LiNameConfig
                   , _sortType :: LiNameSortType
                   , _ignoreName :: Maybe String
                   , _ignorePath :: Maybe String
+                  , _pathFilters :: [LiNameFilter]
+                  , _lineFilters :: [LiNameFilter]
                   , _recursive :: Bool } deriving (Show, Read, Eq, Typeable)
 
 
@@ -58,6 +63,8 @@ instance Default LiNameConfig where
                        , _sortType = DontSort
                        , _ignoreName = Nothing
                        , _ignorePath = Nothing
+                       , _pathFilters = []
+                       , _lineFilters = []
                        , _recursive = True }
 
 
