@@ -11,7 +11,7 @@ import System.Process (readProcess)
 
 
 filterCommand :: LiNameFilter -> String -> IO String
-filterCommand (LiNameFilter cmd) = readProcess cmd []
+filterCommand (LiNameFilter cmd) = readProcess "/bin/sh" ["-c", cmd]
 
 
 filterCommands :: [LiNameFilter] -> [String] -> IO [String]
