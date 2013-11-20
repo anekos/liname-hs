@@ -21,7 +21,7 @@ import Prelude hiding (lookup, fail)
 import Control.Applicative ((<$>))
 import Control.Lens
 import Control.Monad (forM_, unless)
-import Control.Monad.Reader (ask)
+import Control.Monad.Reader (ask, runReaderT)
 import Data.Either (lefts, rights)
 import Data.Either.Unwrap (mapLeft)
 import Data.List ((\\), isPrefixOf)
@@ -32,7 +32,6 @@ import System.IO (hPutStrLn, stderr)
 import System.Posix.Files (getFdStatus, isNamedPipe)
 import System.Posix.IO (stdInput)
 import Text.Printf (printf)
-import Control.Monad.Reader (runReaderT)
 
 
 
