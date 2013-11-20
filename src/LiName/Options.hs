@@ -38,8 +38,11 @@ options =
        (NoArg (\opts -> opts { _recursive = True }))
         "recursive path adding"
    , Option "f" ["filter"]
-       (ReqArg (\value opts -> opts & filters %~ (++ return (LiNameFilterCommand value))) "FILTER_COMMAND")
-        "recursive path adding"
+       (ReqArg (\value opts -> opts & pathFilters %~ (++ return (LiNameFilter value))) "FILTER_COMMAND")
+        "Filter command for path"
+   , Option "F" ["line-filter"]
+       (ReqArg (\value opts -> opts & lineFilters %~ (++ return (LiNameFilter value))) "FILTER_COMMAND")
+        "Filter command for line"
    , Option "R" ["no-recursive"]
        (NoArg (\opts -> opts { _recursive = False }))
         "No recursive path adding" ]

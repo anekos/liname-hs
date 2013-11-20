@@ -5,14 +5,19 @@ module LiName.Filter (
 
 import LiName.Types
 
+import Control.Applicative ((<$>))
 import System.Process (readProcess)
 
 
 
-filterCommand :: LiNameFilterCommand -> String -> IO String
-filterCommand (LiNameFilterCommand cmd) = readProcess cmd []
+filterCommand :: LiNameFilter -> String -> IO String
+filterCommand (LiNameFilter cmd) = readProcess cmd []
 
 
-filterCommands :: [LiNameFilterCommand] -> String -> IO String
-filterCommands []     src = return src
-filterCommands (x:xs) src = filterCommand x src >>= filterCommands xs
+filterCommands :: [LiNameFilter] -> [String] -> IO [String]
+filterCommands cmds ls = lines <$> filterCommands' cmds (unlines ls)
+
+
+filterCommands' :: [LiNameFilter] -> String -> IO String
+filterCommands' []     src = return src
+filterCommands' (x:xs) src = filterCommand x src >>= filterCommands' xs
