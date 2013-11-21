@@ -40,19 +40,22 @@ main' (Left err)               = hPutStrLn stderr err
 main' (Right (conf, pathArgs)) = flip runReaderT conf $ do
     pfs <- _pathFilters <$> ask
     lfs <- _lineFilters <$> ask
-    (common, ps) <- compactPath' (conf^.compact) <$> (loadPath pathArgs >>= sortPathList >>= io . filterCommands pfs)
+    (common, ops) <- compactPath' (conf^.compact) <$> (loadPath pathArgs >>= sortPathList)
+    ps <- io $ filterCommands pfs ops
     let ss = makeSources ps
-        sm = fromList ss
+        oss = makeSources ops
+        sm = fromList oss
+        oss' = map sourceLine oss
     ss' <- io $ filterCommands lfs $ map sourceLine ss
-    results <- editAndProcess ss' sm common
+    results <- editAndProcess oss' ss' sm common
     retry sm common $ lefts results
 
 
 retry :: Map LiNameKey LiNamePath -> String -> [LiNameFail] -> L ()
 retry _ _ []          = return ()
 retry sm common fails = do
-    let ls = fails >>= \(x, y) -> ["# " ++ unbreak y, x]
-    results <- editAndProcess ls sm common
+    let ss = fails >>= \(x, y) -> ["# " ++ unbreak y, x]
+    results <- editAndProcess ss ss sm common
     retry sm common $ lefts results
 
 
@@ -82,9 +85,14 @@ sourceLine :: LiNameSource -> String
 sourceLine (LiNameKey key, fp) = printf "%.4d\t%s" key fp
 
 
-editAndProcess :: [String] -> Map LiNameKey LiNamePath -> String -> L [LiNameResult]
-editAndProcess ss sm common = do
-    ls <- (\\ ss) . filter (not . isPrefixOf "#") <$> edit ss
+editAndProcess
+  :: [String]                 -- ^ Original lines
+  -> [String]                 -- ^ Filterd lines
+  -> Map LiNameKey LiNamePath -- ^ map: Key -> Original path
+  -> String                   -- ^ Common path
+  -> L [LiNameResult]         -- ^ Edited lines by text editor
+editAndProcess oss ss sm common = do
+    ls <- (\\ oss) . filter (not . isPrefixOf "#") <$> edit ss
     results <- mapM (process sm common) ls
     io $ clean $ map snd $ rights results
     io $  putResult (length ss) results
