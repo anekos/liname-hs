@@ -37,6 +37,7 @@ executable liname
                        bytestring       == 0.10.*,
                        containers       == 0.5.*,
                        data-default     == 0.5.*,
+                       datetime         == 0.2.*,
                        directory        == 1.2.*,
                        either-unwrap    == 1.1.*,
                        filepath         == 1.3.*,

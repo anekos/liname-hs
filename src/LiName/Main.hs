@@ -15,6 +15,7 @@ import LiName.Parsers
 import LiName.Path
 import LiName.Sort
 import LiName.Types
+import LiName.Undo
 import LiName.Utils
 
 import Prelude hiding (lookup, fail)
@@ -95,6 +96,7 @@ editAndProcess oss ss sm common = do
     ls <- (\\ oss) . filter (not . isPrefixOf "#") <$> edit ss
     results <- mapM (process sm common) ls
     io $ clean $ map snd $ rights results
+    io $ saveUndoInfo $ rights results
     io $  putResult (length ss) results
     return results
 
