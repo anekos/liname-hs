@@ -96,7 +96,7 @@ editAndProcess oss ss sm common = do
     ls <- (\\ oss) . filter (not . isPrefixOf "#") <$> edit ss
     results <- mapM (process sm common) ls
     io $ clean $ map snd $ rights results
-    io $ saveUndoInfo $ rights results
+    io $ saveUndoInfo common $ rights results
     io $  putResult (length ss) results
     return results
 

@@ -13,14 +13,14 @@ import System.FilePath ((</>))
 
 
 
-saveUndoInfo :: [LiNameSuccess] -> IO ()
-saveUndoInfo ss = do
+saveUndoInfo :: LiNamePath -> [LiNameSuccess] -> IO ()
+saveUndoInfo cp ss = do
     linameDir  <- (</> ".liname") <$> getHomeDirectory
     notExists <- not <$> doesDirectoryExist linameDir
     when notExists $ createDirectory linameDir
     n <- makeNewEntry
-    writeFile (linameDir </> n) $ show ss
+    writeFile (linameDir </> n) $ show $ LiNameUndoInfo cp ss
 
 
-makeNewEntry :: IO (FilePath)
-makeNewEntry = getCurrentTime >>= return . formatDateTime "%Y-%m-%d_%H:%M:%S.liname.undo"
+makeNewEntry :: IO FilePath
+makeNewEntry = formatDateTime "%Y-%m-%d_%H:%M:%S.liname.undo" <$> getCurrentTime
