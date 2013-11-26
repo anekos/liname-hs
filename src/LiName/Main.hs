@@ -18,7 +18,6 @@ import LiName.Types
 import LiName.Undo
 import LiName.Utils
 
-import Prelude hiding (lookup, fail)
 import Control.Applicative ((<$>))
 import Control.Lens
 import Control.Monad (forM_, unless)
@@ -28,6 +27,8 @@ import Data.Either.Unwrap (mapLeft)
 import Data.List ((\\), isPrefixOf)
 import Data.Map (Map, fromList)
 import Data.Map.Lazy (lookup)
+import Prelude hiding (lookup, fail)
+import System.Directory (getCurrentDirectory)
 import System.Environment (getArgs)
 import System.IO (hPutStrLn, stderr)
 import System.Posix.Files (getFdStatus, isNamedPipe)
@@ -93,10 +94,11 @@ editAndProcess
   -> String                   -- ^ Common path
   -> L [LiNameResult]         -- ^ Edited lines by text editor
 editAndProcess oss ss sm common = do
+    cwd <- io $ getCurrentDirectory
     ls <- (\\ oss) . filter (not . isPrefixOf "#") <$> edit ss
     results <- mapM (process sm common) ls
     io $ clean $ map snd $ rights results
-    io $ saveUndoInfo common $ rights results
+    io $ saveUndoInfo cwd common $ rights results
     io $  putResult (length ss) results
     return results
 

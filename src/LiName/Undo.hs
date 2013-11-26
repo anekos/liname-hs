@@ -13,13 +13,13 @@ import System.FilePath ((</>))
 
 
 
-saveUndoInfo :: LiNamePath -> [LiNameSuccess] -> IO ()
-saveUndoInfo cp ss = do
+saveUndoInfo :: LiNamePath -> LiNamePath -> [LiNameSuccess] -> IO ()
+saveUndoInfo cwd cp ss = do
     linameDir  <- (</> ".liname") <$> getHomeDirectory
     notExists <- not <$> doesDirectoryExist linameDir
     when notExists $ createDirectory linameDir
     n <- makeNewEntry
-    writeFile (linameDir </> n) $ show $ LiNameUndoInfo cp ss
+    writeFile (linameDir </> n) $ show $ LiNameUndoInfo cwd cp ss
 
 
 makeNewEntry :: IO FilePath

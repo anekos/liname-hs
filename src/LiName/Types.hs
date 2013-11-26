@@ -26,7 +26,7 @@ type LiNameSource = (LiNameKey, LiNamePath)
 data LiNameEntry = LiNameEntry { _entryKey :: LiNameKey, _action :: LiNameAction } deriving (Show, Eq)
 
 
-data LiNameUndoInfo = LiNameUndoInfo { _commonPath :: LiNamePath, _logs :: [LiNameSuccess] } deriving (Show, Eq)
+data LiNameUndoInfo = LiNameUndoInfo { _workDirectory :: LiNamePath, _commonPath :: LiNamePath, _logs :: [LiNameSuccess] } deriving (Show, Eq)
 
 
 data LiNameCommand = LiNameCommand
