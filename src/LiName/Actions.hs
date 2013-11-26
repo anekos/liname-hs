@@ -1,6 +1,7 @@
 
 module LiName.Actions (
-  doAction
+  doAction,
+  undoAction
 ) where
 
 
@@ -26,6 +27,17 @@ doAction cp DoDelete f      = io $ msgCatch f $ removeFile (cp </> f)
 doAction cp DoTrash  f      = do
     cmd <- _trashCommand <$> ask
     io $ msgCatch f $ fromExitCode <$> run cmd (cp </> f)
+
+
+undoAction :: LiNamePath -> LiNameSuccess -> L (Either String ())
+undoAction cp (LiNameEntry _ a, p) = undoAction' cp a p
+
+
+undoAction' :: LiNamePath -> LiNameAction -> LiNamePath -> L (Either String ())
+undoAction' cp (DoRename t) f = io $ doRename (cp </> t) (cp </> f)
+undoAction' cp (DoCopy t) f   = io $ msgCatch f $ removeFile (cp </> t)
+undoAction' _  DoDelete _     = return $ Right () -- cannot do anything
+undoAction' _  DoTrash _      = return $ Right () -- TODO Restore from trash bin
 
 
 doRename :: LiNamePath -> LiNamePath -> IO (Either String ())
