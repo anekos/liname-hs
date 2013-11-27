@@ -2,8 +2,9 @@
 module Main (main) where
 
 import LiName.Main
+import System.Environment (getArgs)
 
 
 
 main :: IO ()
-main = getConf >>= main'
+main = getArgs >>= getConf False >>= main'
