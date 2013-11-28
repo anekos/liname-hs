@@ -24,8 +24,9 @@ main = do
 
 
 main' :: [String] -> L ()
-main' []    = io $ getUndoInfoFiles >>= mapM_ (putStrLn . undoInfoLine) . zip [0..]
-main' (n:_) = do
+main' []        = io $ getUndoInfoFiles >>= mapM_ (putStrLn . undoInfoLine) . zip [0..]
+main' ("-h":_)  = io $ putStrLn "Usage: undo-liname [<UNDO_NUMBER>]"
+main' (n:_)     = do
     LiNameUndoInfo wd cp logs <- io $ read <$> (getUndoInfoFiles >>= readFile . (!! read n) . reverse . sort)
     let cp' = wd </> cp
     mapM (process cp') logs >>= io . putResult "target" (length logs)
