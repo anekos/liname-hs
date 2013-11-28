@@ -2,7 +2,8 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module LiName.Config (
-  getConf
+  getConf,
+  loadConfigFile
 ) where
 
 

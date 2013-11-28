@@ -18,10 +18,9 @@ import Text.Printf (printf)
 
 main :: IO ()
 main = do
-  econf <- getArgs >>= getConf True
-  case econf of
-    (Right (conf, as)) -> runReaderT (main' as) conf
-    (Left err)         -> putStrLn err
+    conf <- loadConfigFile
+    as <- getArgs
+    runReaderT (main' as) conf
 
 
 main' :: [String] -> L ()
