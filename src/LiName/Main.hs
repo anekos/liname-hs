@@ -10,27 +10,25 @@ import LiName.Command
 import LiName.Config
 import LiName.Filter
 import LiName.Loader
-import LiName.Options
 import LiName.Parsers
 import LiName.Path
+import LiName.Result
 import LiName.Sort
 import LiName.Types
+import LiName.Undo
 import LiName.Utils
 
-import Prelude hiding (lookup, fail)
 import Control.Applicative ((<$>))
 import Control.Lens
-import Control.Monad (forM_, unless)
 import Control.Monad.Reader (ask, runReaderT)
 import Data.Either (lefts, rights)
 import Data.Either.Unwrap (mapLeft)
 import Data.List ((\\), isPrefixOf)
 import Data.Map (Map, fromList)
 import Data.Map.Lazy (lookup)
-import System.Environment (getArgs)
+import Prelude hiding (lookup, fail)
+import System.Directory (getCurrentDirectory)
 import System.IO (hPutStrLn, stderr)
-import System.Posix.Files (getFdStatus, isNamedPipe)
-import System.Posix.IO (stdInput)
 import Text.Printf (printf)
 
 
@@ -59,28 +57,6 @@ retry sm common fails = do
     retry sm common $ lefts results
 
 
-getConf :: IO (Either String (LiNameConfig, [String]))
-getConf = do
-    fileConf <- loadConfigFile
-    as <- getArgs
-    fd <- getFdStatus stdInput
-    pas <- if isNamedPipe fd then lines <$> getContents else return []
-    parseOptions False fileConf $ as ++ pas
-
-
-putResult :: Int -> [LiNameResult] -> IO ()
-putResult inputs rs = do
-    let fails = lefts rs
-    putStrLn "Results"
-    putStrLn $ printf (indent "input:    %4d") inputs
-    putStrLn $ printf (indent "try:      %4d") $ length rs
-    putStrLn $ printf (indent "success:  %4d") $ length $ rights rs
-    putStrLn $ printf (indent "fail:     %4d") $ length fails
-    unless (null fails) $ do
-      hPutStrLn stderr "Fails"
-      forM_ fails $ \(line, err) -> hPutStrLn stderr $ indent line ++ "\n" ++ indent ('\t' : unbreak err)
-
-
 sourceLine :: LiNameSource -> String
 sourceLine (LiNameKey key, fp) = printf "%.4d\t%s" key fp
 
@@ -92,10 +68,12 @@ editAndProcess
   -> String                   -- ^ Common path
   -> L [LiNameResult]         -- ^ Edited lines by text editor
 editAndProcess oss ss sm common = do
+    cwd <- io getCurrentDirectory
     ls <- (\\ oss) . filter (not . isPrefixOf "#") <$> edit ss
     results <- mapM (process sm common) ls
     io $ clean $ map snd $ rights results
-    io $  putResult (length ss) results
+    io $ saveUndoInfo cwd common $ rights results
+    io $  putResult "input" (length ss) results
     return results
 
 
@@ -119,7 +97,3 @@ readLine line = mapLeft ((line,) . show) $ parseEntry "" line
 
 findPath :: Map LiNameKey LiNamePath -> LiNameEntry -> Maybe LiNamePath
 findPath sm entry = lookup (entry^.entryKey) sm
-
-
-indent :: String -> String
-indent = ("  " ++)

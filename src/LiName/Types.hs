@@ -10,20 +10,23 @@ import Data.Typeable
 
 type LiNamePath = FilePath
 
-data LiNameKey = LiNameKey Int deriving (Show, Eq, Ord)
+data LiNameKey = LiNameKey Int deriving (Show, Read, Eq, Ord)
 
 
 data LiNameAction = DoRename String
                   | DoDelete
                   | DoTrash
                   | DoCopy String
-                  deriving (Show, Eq)
+                  deriving (Show, Read, Eq)
 
 
 type LiNameSource = (LiNameKey, LiNamePath)
 
 
-data LiNameEntry = LiNameEntry { _entryKey :: LiNameKey, _action :: LiNameAction } deriving (Show, Eq)
+data LiNameEntry = LiNameEntry { _entryKey :: LiNameKey, _action :: LiNameAction } deriving (Show, Read, Eq)
+
+
+data LiNameUndoInfo = LiNameUndoInfo { _workDirectory :: LiNamePath, _commonPath :: LiNamePath, _logs :: [LiNameSuccess] } deriving (Show, Read, Eq)
 
 
 data LiNameCommand = LiNameCommand

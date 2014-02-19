@@ -2,6 +2,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module LiName.Config (
+  getConf,
   loadConfigFile
 ) where
 
@@ -9,16 +10,26 @@ module LiName.Config (
 import LiName.Options
 import LiName.Types
 
-import Prelude hiding (lookup)
+import Control.Applicative ((<$>))
 import Control.Exception
 import Control.Lens
 import Data.Default (def)
+import Data.Text (pack)
 import Data.Yaml.Config
+import Prelude hiding (lookup)
 import System.Directory (getHomeDirectory)
 import System.FilePath (combine)
-import Data.Text (pack)
-import Control.Applicative ((<$>))
+import System.Posix.Files (getFdStatus, isNamedPipe)
+import System.Posix.IO (stdInput)
 
+
+
+getConf :: Bool -> [String] -> IO (Either String (LiNameConfig, [String]))
+getConf allowEmpty as = do
+    fileConf <- loadConfigFile
+    fd <- getFdStatus stdInput
+    pas <- if isNamedPipe fd then lines <$> getContents else return []
+    parseOptions allowEmpty fileConf $ as ++ pas
 
 
 loadConfigFile :: IO LiNameConfig

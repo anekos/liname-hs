@@ -32,3 +32,7 @@ addDelim = (++ "/")
 makeNotMatcher :: String -> String -> Bool
 makeNotMatcher s = let re = mkRegex s
                    in  isNothing . matchRegex re
+
+
+indent :: String -> String
+indent = ("  " ++)
