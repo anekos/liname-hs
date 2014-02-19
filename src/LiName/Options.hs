@@ -34,6 +34,9 @@ options =
    , Option "c" ["compact"]
        (ReqArg (\value opts -> opts { _compact = Just $ read value }) "LEVEL")
        "Compact directory part"
+   , Option "C" ["no-compact"]
+       (NoArg (\opts -> opts { _compact = Nothing }))
+       "NO Compact directory part"
    , Option "r" ["recursive"]
        (NoArg (\opts -> opts { _recursive = True }))
         "recursive path adding"
