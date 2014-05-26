@@ -1,20 +1,15 @@
 
+.PHONY : clean test
+
 build:
 	cabal --with-ld=ld.gold configure
 	cabal --with-ld=ld.gold build
 
-i:
-	cabal-dev ghci
-
-t:
-	cabal configure --enable-tests
+test:
 	cabal build
 	cabal test
 
-d:
-	cabal install --enable-test --only-dependencies
-
-l: clean build
+lint: clean build
 	hlint src
 
 ctags:
@@ -23,3 +18,13 @@ ctags:
 clean:
 	find . -name "*.hi" -exec rm '{}' \;
 	find . -name "*.o" -exec rm '{}' \;
+
+cabal-sandbox-init:
+	cabal sandbox init
+	cabal install --only-dependencies --enable-tests
+	cabal configure --enable-tests
+
+cabal-sandbox-install-dependencies:
+	cabal install --enable-test --only-dependencies
+	cabal configure --enable-tests
+

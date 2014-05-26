@@ -39,7 +39,7 @@ loadConfigFile = do
     ec <- makeCommand' y "editor" editorCommandDefault
     tc <- makeCommand' y "trash" trashCommandDefault
     let cmded = def { _editorCommand = ec , _trashCommand = tc }
-        opts = lookupDefault y (pack "options") []
+        opts = lookupDefault (pack "options") [] y
     parsed <- parseOptions True cmded opts
     case parsed of
       (Right (conf, _)) -> return conf
@@ -49,13 +49,13 @@ loadConfigFile = do
 
 
 makeCommand :: LiNameCommand -> Config -> LiNameCommand
-makeCommand d c = LiNameCommand { _path = lookupDefault c (pack "command") (d^.path)
-                                , _args = lookupDefault c (pack "options") (d^.args)
-                                , _placeHolder = lookupDefault c (pack "place_holder") (d^.placeHolder) }
+makeCommand d c = LiNameCommand { _path = lookupDefault (pack "command") (d^.path) c
+                                , _args = lookupDefault (pack "options") (d^.args) c
+                                , _placeHolder = lookupDefault (pack "place_holder") (d^.placeHolder) c }
 
 
 makeCommand' :: Config -> String -> LiNameCommand -> IO LiNameCommand
-makeCommand' y n d = withDefault d $ makeCommand d <$> subconfig y (pack n)
+makeCommand' y n d = withDefault d $ makeCommand d <$> subconfig (pack n) y
 
 
 withDefault :: a -> IO a -> IO a
