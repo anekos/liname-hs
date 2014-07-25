@@ -1,7 +1,7 @@
 
 .PHONY : clean test
 
-build:
+build: .cabal-sandbox
 	cabal --with-ld=ld.gold configure
 	cabal --with-ld=ld.gold build
 
@@ -19,12 +19,12 @@ clean:
 	find . -name "*.hi" -exec rm '{}' \;
 	find . -name "*.o" -exec rm '{}' \;
 
-cabal-sandbox-init:
+.cabal-sandbox:
 	cabal sandbox init
 	cabal install --only-dependencies --enable-tests
 	cabal configure --enable-tests
 
-cabal-sandbox-install-dependencies:
+install-dependencies:
 	cabal install --enable-test --only-dependencies
 	cabal configure --enable-tests
 
