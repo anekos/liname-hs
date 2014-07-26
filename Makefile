@@ -5,7 +5,7 @@ build: .cabal-sandbox
 	cabal --with-ld=ld.gold configure
 	cabal --with-ld=ld.gold build
 
-test:
+test: .cabal-sandbox
 	cabal build
 	cabal test
 
