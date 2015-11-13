@@ -5,26 +5,23 @@ build: .cabal-sandbox
 	cabal --with-ld=ld.gold configure
 	cabal --with-ld=ld.gold build
 
-test: .cabal-sandbox
+test:
+	cabal configure --enable-tests
 	cabal build
 	cabal test
 
-lint: clean build
-	hlint src
-
-ctags:
-	cd src && lushtags **/*.hs | tee tags
+# d:
+# 	cabal install --enable-test --only-dependencies
 
 clean:
 	find . -name "*.hi" -exec rm '{}' \;
 	find . -name "*.o" -exec rm '{}' \;
 
+dependencies:
+	cabal install --only-dependencies
+	cabal configure
+
 .cabal-sandbox:
 	cabal sandbox init
 	cabal install --only-dependencies --enable-tests
 	cabal configure --enable-tests
-
-install-dependencies:
-	cabal install --enable-test --only-dependencies
-	cabal configure --enable-tests
-
