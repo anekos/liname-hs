@@ -5,7 +5,7 @@ module LiName.PathSpec where
 import LiName.Types
 import LiName.Path
 
-import Data.Either.Unwrap
+import Data.Either
 import Test.Hspec
 import Text.ParserCombinators.Parsec.Error
 

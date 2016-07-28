@@ -5,13 +5,9 @@ module LiName.ParsersSpec where
 import LiName.Types
 import LiName.Parsers
 
-import Data.Either.Unwrap
+import Data.Either
 import Test.Hspec
 import Text.ParserCombinators.Parsec.Error
-
-
-instance Eq ParseError where
-  _ == _ = True
 
 
 fn = "<HSpec>"
