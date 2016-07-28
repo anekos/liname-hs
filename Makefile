@@ -1,30 +1,15 @@
 
-.PHONY : clean test
+.PHONY : clean test build
 
-build: .cabal-sandbox
-	cabal --with-ld=ld.gold configure
-	cabal --with-ld=ld.gold build
 
-test: .cabal-sandbox
-	cabal build
-	cabal test
+liname: build
+	- unlink liname
+	- ln -s $(PWD)/.stack-work/install/x86_64-linux/lts-6.9/7.10.3/bin/liname .
 
-lint: clean build
-	hlint src
 
-ctags:
-	cd src && lushtags **/*.hs | tee tags
+build:
+	stack build
 
-clean:
-	find . -name "*.hi" -exec rm '{}' \;
-	find . -name "*.o" -exec rm '{}' \;
 
-.cabal-sandbox:
-	cabal sandbox init
-	cabal install --only-dependencies --enable-tests
-	cabal configure --enable-tests
-
-install-dependencies:
-	cabal install --enable-test --only-dependencies
-	cabal configure --enable-tests
-
+stack.yaml: liname.cabal
+	stack init --force

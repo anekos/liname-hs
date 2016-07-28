@@ -1,5 +1,5 @@
 
-{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE ScopedTypeVariables, OverloadedStrings #-}
 
 module LiName.Config (
   getConf,
@@ -14,14 +14,45 @@ import Control.Applicative ((<$>))
 import Control.Exception
 import Control.Lens
 import Data.Default (def)
-import Data.Text (pack)
-import Data.Yaml.Config
+import Data.Text (pack, Text)
+import qualified Data.Yaml as Y
+import Data.Yaml (FromJSON, (.:), (.:?), (.!=))
+import Data.Yaml.Config (loadYamlSettings, ignoreEnv)
 import Prelude hiding (lookup)
 import System.Directory (getHomeDirectory)
 import System.FilePath (combine)
 import System.Posix.Files (getFdStatus, isNamedPipe)
 import System.Posix.IO (stdInput)
 
+
+data LiNameYamlConfig = LiNameYamlConfig { _yEditorCommand :: LiNameCommand
+                                         , _yTrashCommand :: LiNameCommand
+                                         , _yOptoins :: [String]}
+
+instance FromJSON LiNameCommand where
+  parseJSON (Y.Object v) =
+    LiNameCommand <$>
+      v .: "command" <*>
+      v .: "options" <*>
+      v .: "place_holder"
+
+
+instance FromJSON LiNameYamlConfig where
+  parseJSON (Y.Object v) =
+    LiNameYamlConfig <$>
+      v .:? "editor" .!= editorCommandDefault <*>
+      v .:? "trash" .!= trashCommandDefault <*>
+      v .:? "options" .!= []
+  parseJSON _ = fail "Expected Object for Config value"
+
+
+fromYConfig :: LiNameYamlConfig -> IO LiNameConfig
+fromYConfig (LiNameYamlConfig e t o) = do
+  let cmded = def { _editorCommand = e, _trashCommand = t }
+  parsed <- parseOptions True cmded o
+  case parsed of
+       (Right (conf, _)) -> return conf
+       (Left e)          -> putStrLn e >> return cmded
 
 
 getConf :: Bool -> [String] -> IO (Either String (LiNameConfig, [String]))
@@ -35,27 +66,10 @@ getConf allowEmpty as = do
 loadConfigFile :: IO LiNameConfig
 loadConfigFile = do
     home <- getHomeDirectory
-    y <- load $ combine home ".liname.yaml"
-    ec <- makeCommand' y "editor" editorCommandDefault
-    tc <- makeCommand' y "trash" trashCommandDefault
-    let cmded = def { _editorCommand = ec , _trashCommand = tc }
-        opts = lookupDefault (pack "options") [] y
-    parsed <- parseOptions True cmded opts
-    case parsed of
-      (Right (conf, _)) -> return conf
-      (Left e)          -> putStrLn e >> return cmded
+    let y = combine home ".liname.yaml"
+    loadYamlSettings [y] [] ignoreEnv >>= fromYConfig
   `catch`
     catchAndReturnDefault def
-
-
-makeCommand :: LiNameCommand -> Config -> LiNameCommand
-makeCommand d c = LiNameCommand { _path = lookupDefault (pack "command") (d^.path) c
-                                , _args = lookupDefault (pack "options") (d^.args) c
-                                , _placeHolder = lookupDefault (pack "place_holder") (d^.placeHolder) c }
-
-
-makeCommand' :: Config -> String -> LiNameCommand -> IO LiNameCommand
-makeCommand' y n d = withDefault d $ makeCommand d <$> subconfig (pack n) y
 
 
 withDefault :: a -> IO a -> IO a
