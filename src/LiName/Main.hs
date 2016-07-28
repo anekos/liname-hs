@@ -22,7 +22,7 @@ import Control.Applicative ((<$>))
 import Control.Lens
 import Control.Monad.Reader (ask, runReaderT)
 import Data.Either (lefts, rights)
-import Data.Either.Unwrap (mapLeft)
+import Data.Either.Combinators (mapLeft)
 import Data.List ((\\), isPrefixOf)
 import Data.Map (Map, fromList)
 import Data.Map.Lazy (lookup)

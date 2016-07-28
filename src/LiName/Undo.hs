@@ -7,7 +7,8 @@ import LiName.Types
 
 import Control.Applicative ((<$>))
 import Control.Monad (when)
-import Data.DateTime (formatDateTime, getCurrentTime)
+import Data.Time.Clock (getCurrentTime)
+import Data.Time.Format (formatTime, defaultTimeLocale)
 import System.Directory (createDirectory, doesDirectoryExist, getHomeDirectory)
 import System.FilePath ((</>))
 
@@ -23,4 +24,6 @@ saveUndoInfo cwd cp ss = do
 
 
 makeNewEntry :: IO FilePath
-makeNewEntry = formatDateTime "%Y-%m-%d_%H:%M:%S.liname.undo" <$> getCurrentTime
+makeNewEntry = do
+  t <- getCurrentTime
+  return $ formatTime defaultTimeLocale "%Y-%m-%d_%H:%M:%S.liname.undo" t
