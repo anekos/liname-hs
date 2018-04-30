@@ -36,7 +36,7 @@ edit contents = do
 makeTempFile :: [String] -> IO String
 makeTempFile cs = do
     dir <- getTemporaryDirectory
-    (fn, h) <- openTempFile dir "liname-.txt"
+    (fn, h) <- openTempFile dir "liname-.liname"
     hPutStr h $ unlines cs
     hClose h
     return fn
