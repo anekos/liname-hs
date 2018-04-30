@@ -4,7 +4,7 @@
 
 liname: build
 	- unlink liname
-	- ln -s $(PWD)/.stack-work/install/x86_64-linux/lts-6.9/7.10.3/bin/liname .
+	- ln -s $(PWD)/.stack-work/install/x86_64-linux-tinfo6-nopie/lts-11.7/8.2.2/bin/liname .
 
 
 build:
