@@ -25,18 +25,20 @@ run cmd arg = do
 edit :: [String] -> L [String]
 edit contents = do
     cmd <- _editorCommand <$> ask
+    ext <- _extension <$> ask
     io $ do
-      fn <- makeTempFile contents
+      fn <- makeTempFile ext contents
       run cmd fn
       ls <- lines <$> readFile fn
       removeFile fn
       return ls
 
 
-makeTempFile :: [String] -> IO String
-makeTempFile cs = do
+makeTempFile :: String -> [String] -> IO String
+makeTempFile ext cs = do
     dir <- getTemporaryDirectory
-    (fn, h) <- openTempFile dir "liname-.liname"
+    let filename = "liname-." ++ ext
+    (fn, h) <- openTempFile dir filename
     hPutStr h $ unlines cs
     hClose h
     return fn

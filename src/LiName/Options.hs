@@ -48,7 +48,10 @@ options =
         "Filter command for line"
    , Option "R" ["no-recursive"]
        (NoArg (\opts -> opts { _recursive = False }))
-        "No recursive path adding" ]
+        "No recursive path adding"
+   , Option "e" ["ext", "extension"]
+       (ReqArg (\value opts -> opts { _extension = value }) "EXTENSION")
+        "Temporary file extension" ]
 
 
 parseOptions :: Bool -> LiNameConfig -> [String] -> IO (Either String (LiNameConfig, [String]))

@@ -56,7 +56,8 @@ data LiNameConfig = LiNameConfig
                   , _ignorePath :: Maybe String
                   , _pathFilters :: [LiNameFilter]
                   , _lineFilters :: [LiNameFilter]
-                  , _recursive :: Bool } deriving (Show, Read, Eq, Typeable)
+                  , _recursive :: Bool
+                  , _extension :: String } deriving (Show, Read, Eq, Typeable)
 
 
 instance Default LiNameConfig where
@@ -68,7 +69,8 @@ instance Default LiNameConfig where
                        , _ignorePath = Nothing
                        , _pathFilters = []
                        , _lineFilters = []
-                       , _recursive = True }
+                       , _recursive = True
+                       , _extension = "liname" }
 
 
 type LiNameSuccess = (LiNameEntry, LiNamePath)
