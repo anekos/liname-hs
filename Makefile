@@ -4,7 +4,7 @@
 
 liname: build
 	- unlink liname
-	- ln -s $(PWD)/.stack-work/install/x86_64-linux-tinfo6-nopie/lts-11.7/8.2.2/bin/liname .
+	- ln -s $(shell find .stack-work/install -type f -executable -name liname | head -n 1) .
 
 
 build:
@@ -13,3 +13,7 @@ build:
 
 stack.yaml: liname.cabal
 	stack init --force
+
+
+clean:
+	stack clean --full
