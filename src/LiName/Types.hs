@@ -54,6 +54,7 @@ data LiNameConfig = LiNameConfig
                   , _sortType :: LiNameSortType
                   , _ignoreName :: Maybe String
                   , _ignorePath :: Maybe String
+                  , _listFile :: Maybe String
                   , _pathFilters :: [LiNameFilter]
                   , _lineFilters :: [LiNameFilter]
                   , _recursive :: Bool

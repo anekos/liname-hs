@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module LiName.Loader (
-  loadPath,
+  loadListAndPath,
   makeSources
 ) where
 
@@ -15,10 +15,17 @@ import Data.Text (pack, stripPrefix, unpack)
 import System.Directory (getDirectoryContents)
 import System.FilePath (combine)
 import System.FilePath.Posix (takeFileName)
-import System.IO (hPrint, stderr)
+import System.IO (hGetContents, hPrint, IOMode(ReadMode), openFile, stderr)
 import System.IO.Error (catchIOError)
 import System.Posix.Files (getFileStatus, isDirectory, isRegularFile)
 
+
+
+loadListAndPath :: Maybe FilePath -> [FilePath] -> L [LiNamePath]
+loadListAndPath lf fps = do
+    lfps <- maybe (return []) loadList lf
+    lpps <- loadPath fps
+    return $ lfps ++ lpps
 
 
 loadPath :: [FilePath] -> L [LiNamePath]
@@ -66,3 +73,10 @@ makeSources = zip (map LiNameKey [1..])
 
 cleanPath :: LiNamePath -> LiNamePath
 cleanPath fp = maybe fp unpack $ stripPrefix "./" $ pack fp
+
+
+loadList :: FilePath -> L [LiNamePath]
+loadList fp = do
+    handle <- io $ openFile fp ReadMode
+    contents <- io $ lines <$> hGetContents handle
+    return contents

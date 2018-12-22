@@ -38,7 +38,8 @@ main' (Left err)               = hPutStrLn stderr err
 main' (Right (conf, pathArgs)) = flip runReaderT conf $ do
     pfs <- _pathFilters <$> ask
     lfs <- _lineFilters <$> ask
-    (common, ops) <- compactPath' (conf^.compact) <$> (loadPath pathArgs >>= sortPathList)
+    lf <- _listFile <$> ask
+    (common, ops) <- compactPath' (conf^.compact) <$> (loadListAndPath lf pathArgs >>= sortPathList)
     ps <- io $ filterCommands pfs ops
     let ss = makeSources ps
         oss = makeSources ops

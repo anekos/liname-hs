@@ -51,7 +51,10 @@ options =
         "No recursive path adding"
    , Option "e" ["ext", "extension"]
        (ReqArg (\value opts -> opts { _extension = value }) "EXTENSION")
-        "Temporary file extension" ]
+        "Temporary file extension"
+   , Option "l" ["list"]
+       (ReqArg (\value opts -> opts { _listFile = Just value }) "LIST_FILE")
+        "Path list file" ]
 
 
 parseOptions :: Bool -> LiNameConfig -> [String] -> IO (Either String (LiNameConfig, [String]))
@@ -59,7 +62,9 @@ parseOptions allowEmpty conf argv = parseOptions' allowEmpty conf $ getOpt Permu
 
 
 parseOptions' :: Bool -> LiNameConfig -> ([LiNameConfig -> LiNameConfig], [String], [String]) -> IO (Either String (LiNameConfig, [String]))
-parseOptions' False _ (_, [], es) = return $ Left $ usage es
+parseOptions' False c (o, [], es) = return $ f $ foldl (flip id) c o
+  where f LiNameConfig { _listFile = Nothing } = Left $ usage es
+        f c                                    = Right (c, [])
 parseOptions' _     c (o, n, [])  = return $ Right (foldl (flip id) c o, n)
 parseOptions' _     _ (_, _, es)  = return $ Left $ usage es
 
