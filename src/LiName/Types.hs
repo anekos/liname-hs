@@ -68,6 +68,7 @@ instance Default LiNameConfig where
                        , _sortType = DontSort
                        , _ignoreName = Nothing
                        , _ignorePath = Nothing
+                       , _listFile = Nothing
                        , _pathFilters = []
                        , _lineFilters = []
                        , _recursive = True
