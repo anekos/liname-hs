@@ -24,6 +24,7 @@ options =
                 , "           p = file path"
                 , "           N = file name (case insesitve)"
                 , "           P = file path (case insesitve)"
+                , "           - = dont sort"
                 , "           iX = inverted X" ])
    , Option "i" ["ignore"]
        (ReqArg (\value opts -> opts { _ignoreName = Just value }) "REGEXP")
