@@ -45,6 +45,10 @@
           type = "app";
           program = "${liname-hs}/bin/liname";
         };
+        apps.undo-liname = {
+          type = "app";
+          program = "${liname-hs}/bin/undo-liname";
+        };
       }
     );
 }
