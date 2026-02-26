@@ -58,6 +58,7 @@ data LiNameConfig = LiNameConfig
                   , _pathFilters :: [LiNameFilter]
                   , _lineFilters :: [LiNameFilter]
                   , _recursive :: Bool
+                  , _pairList :: Maybe (Maybe String)
                   , _extension :: String } deriving (Show, Read, Eq, Typeable)
 
 
@@ -72,6 +73,7 @@ instance Default LiNameConfig where
                        , _pathFilters = []
                        , _lineFilters = []
                        , _recursive = True
+                       , _pairList = Nothing
                        , _extension = "liname" }
 
 

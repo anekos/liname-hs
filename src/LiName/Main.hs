@@ -46,8 +46,11 @@ main' (Right (conf, pathArgs)) = flip runReaderT conf $ do
         sm = fromList oss
         oss' = map sourceLine oss
     ss' <- io $ filterCommands lfs $ map sourceLine ss
-    results <- editAndProcess oss' ss' sm common
-    retry sm common $ lefts results
+    case conf^.pairList of
+      Just prefix ->
+        editAndPrintPairs prefix oss' ss' sm common >>= (retry sm common . lefts)
+      _ ->
+        editAndProcess oss' ss' sm common >>= (retry sm common . lefts)
 
 
 retry :: Map LiNameKey LiNamePath -> String -> [LiNameFail] -> L ()
@@ -90,6 +93,37 @@ process sm common line =
                 case r of
                   Right ()  -> return $ Right (entry, fp)
                   Left err' -> return $ Left (line, err')
+
+
+editAndPrintPairs
+  :: Maybe String
+  -> [String]                 -- ^ Original lines
+  -> [String]                 -- ^ Filterd lines
+  -> Map LiNameKey LiNamePath -- ^ map: Key -> Original path
+  -> String                   -- ^ Common path
+  -> L [LiNameResult]         -- ^ Edited lines by text editor
+editAndPrintPairs prefix oss ss sm common = do
+    cwd <- io getCurrentDirectory
+    ls <- (\\ oss) . filter (not . isPrefixOf "#") <$> edit ss
+    results <- mapM (printPairs prefix sm common) ls
+    return results
+
+
+printPairs :: Maybe String -> Map LiNameKey LiNamePath -> LiNamePath -> String -> L LiNameResult
+printPairs prefix sm common line =
+    case readLine line of
+      Left fail   -> return $ Left fail
+      Right entry ->
+        case findPath sm entry of
+          Nothing -> return $ Left (line, "Not found key: " ++ show (entry^.entryKey))
+          Just fp -> do
+            case entry^.action of
+              DoRename t -> do
+                  -- FIXME Correct filepath escaping
+                  let prefix' = maybe "" (++ " ") prefix
+                  io $ putStrLn $ printf "%s%s\t%s" prefix' (show fp) (show t)
+                  return $ Right (entry, fp)
+              _          -> return $ Left (line, "Cannot print copy action: " ++ show (entry^.entryKey))
 
 
 readLine :: String -> Either LiNameFail LiNameEntry

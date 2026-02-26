@@ -55,7 +55,13 @@ options =
         "Temporary file extension"
    , Option "l" ["list"]
        (ReqArg (\value opts -> opts { _listFile = Just value }) "LIST_FILE")
-        "Path list file" ]
+        "Path list file"
+   , Option "p" ["pair-list"]
+       (NoArg (\opts -> opts { _pairList = Just Nothing }))
+        "Do not rename, but print from/to pair list for shell script"
+   , Option "P" ["pair-list"]
+       (ReqArg (\value opts -> opts { _pairList = Just $ Just value }) "PREFIX")
+        "Do not rename, but print from/to pair list for shell script" ]
 
 
 parseOptions :: Bool -> LiNameConfig -> [String] -> IO (Either String (LiNameConfig, [String]))
