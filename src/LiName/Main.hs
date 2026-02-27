@@ -119,11 +119,17 @@ printPairs prefix sm common line =
           Just fp -> do
             case entry^.action of
               DoRename t -> do
-                  -- FIXME Correct filepath escaping
                   let prefix' = maybe "" (++ " ") prefix
-                  io $ putStrLn $ printf "%s%s\t%s" prefix' (show fp) (show t)
+                  io $ putStrLn $ printf "%s%s\t%s" prefix' (shellEscape fp) (shellEscape t)
                   return $ Right (entry, fp)
               _          -> return $ Left (line, "Cannot print copy action: " ++ show (entry^.entryKey))
+
+
+shellEscape :: FilePath -> String
+shellEscape s = "'" ++ concatMap escape s ++ "'"
+  where
+    escape '\'' = "'\\''"
+    escape c    = [c]
 
 
 readLine :: String -> Either LiNameFail LiNameEntry
