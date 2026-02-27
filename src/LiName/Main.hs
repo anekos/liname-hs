@@ -48,7 +48,7 @@ main' (Right (conf, pathArgs)) = flip runReaderT conf $ do
     ss' <- io $ filterCommands lfs $ map sourceLine ss
     case conf^.pairList of
       Just prefix ->
-        editAndPrintPairs prefix oss' ss' sm common >>= (retry sm common . lefts)
+        editAndPrintPairs prefix (conf^.editOutput) oss' ss' sm common
       _ ->
         editAndProcess oss' ss' sm common >>= (retry sm common . lefts)
 
@@ -96,33 +96,38 @@ process sm common line =
 
 
 editAndPrintPairs
-  :: Maybe String
+  :: Maybe String             -- ^ Prefix
+  -> Bool                     -- ^ Do Edit ?
   -> [String]                 -- ^ Original lines
   -> [String]                 -- ^ Filterd lines
   -> Map LiNameKey LiNamePath -- ^ map: Key -> Original path
   -> String                   -- ^ Common path
-  -> L [LiNameResult]         -- ^ Edited lines by text editor
-editAndPrintPairs prefix oss ss sm common = do
+  -> L ()
+editAndPrintPairs prefix doEdit oss ss sm common = do
     cwd <- io getCurrentDirectory
     ls <- (\\ oss) . filter (not . isPrefixOf "#") <$> edit ss
     results <- mapM (printPairs prefix sm common) ls
-    return results
+    if doEdit then
+      do edit results
+         return ()
+    else
+      return ()
 
 
-printPairs :: Maybe String -> Map LiNameKey LiNamePath -> LiNamePath -> String -> L LiNameResult
+printPairs :: Maybe String -> Map LiNameKey LiNamePath -> LiNamePath -> String -> L String
 printPairs prefix sm common line =
     case readLine line of
-      Left fail   -> return $ Left fail
+      Left fail   -> return $ show fail
       Right entry ->
         case findPath sm entry of
-          Nothing -> return $ Left (line, "Not found key: " ++ show (entry^.entryKey))
+          Nothing -> return $ "Not found key: " ++ show (entry^.entryKey)
           Just fp -> do
             case entry^.action of
               DoRename t -> do
                   let prefix' = maybe "" (++ " ") prefix
-                  io $ putStrLn $ printf "%s%s\t%s" prefix' (shellEscape fp) (shellEscape t)
-                  return $ Right (entry, fp)
-              _          -> return $ Left (line, "Cannot print copy action: " ++ show (entry^.entryKey))
+                      line = printf "%s%s\t%s" prefix' (shellEscape fp) (shellEscape t)
+                  return line
+              _          -> return  $ "# Cannot print copy action: " ++ show (entry^.entryKey)
 
 
 shellEscape :: FilePath -> String

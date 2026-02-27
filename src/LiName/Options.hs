@@ -61,7 +61,10 @@ options =
         "Do not rename, but print from/to pair list for shell script"
    , Option "P" ["pair-list"]
        (ReqArg (\value opts -> opts { _pairList = Just $ Just value }) "PREFIX")
-        "Do not rename, but print from/to pair list for shell script" ]
+        "Do not rename, but print from/to pair list for shell script"
+   , Option "E" ["edit"]
+       (NoArg (\opts -> opts { _editOutput = True }))
+        "Edit output for -p/-P" ]
 
 
 parseOptions :: Bool -> LiNameConfig -> [String] -> IO (Either String (LiNameConfig, [String]))
